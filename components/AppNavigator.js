@@ -7,6 +7,7 @@ import Parent from './normal/Parent';
 import LanguageSelection from '../screens/Language';
 import Slider from './Carousel';
 import Home from '../screens/Home';
+import ContactsInfo from './contact/Contacts';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,11 @@ const AppNavigator = () => {
           name="Info"
           component={Slider}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Contacts"
+          component={ContactsInfo}
+          options={{ headerShown: true }}
         />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Parent" component={Parent} options={{headerShown:false}}/>

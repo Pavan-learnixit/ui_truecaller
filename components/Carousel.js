@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import * as React from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
@@ -20,8 +21,8 @@ function Slider() {
                             flex: 1,
                             borderWidth: 1,
                             justifyContent: 'center',
-                            width : "80%",
-                            marginLeft : "10%"
+                            width : '80%',
+                            marginLeft : '10%',
                         }}
                     >
                         <Text style={{ textAlign: 'center', fontSize: 30 }}>

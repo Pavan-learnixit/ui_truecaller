@@ -1,69 +1,27 @@
-import { useFocusEffect } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { Platform } from 'react-native';
-import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import commonStyles from '../assets/css/Style';
+import { languages } from '../assets/data/Data';
 
 const LanguageSelection = ({ navigation }) => {
 
-  useFocusEffect(
-    React.useCallback(() =>{
-      requestPermissions();
-    },[])
-  )
-
-  const requestPermissions = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        // Request permissions for contacts
-        const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
-        const callLogPermission = await request(PERMISSIONS.ANDROID.READ_CALL_LOG);
-  
-        if (
-          contactsPermission === RESULTS.GRANTED &&
-          callLogPermission === RESULTS.GRANTED
-        ) {
-          console.log('Permissions granted for contacts and call logs');
-        } else {
-          console.log('Permissions denied');
-        }
-      } catch (error) {
-        console.error('Error requesting permissions', error);
-      }
-    }
-  };
-  
-  const languages = [
-    { code: 'kn', label: 'ಕನ್ನಡ' },
-    { code: 'en', label: 'English' },
-    { code: 'hi', label: 'हिंदी' },
-    { code: 'bn', label: 'বাংলা' },
-    { code: 'te', label: 'తెలుగు' },
-    { code: 'mr', label: 'मराठी' },
-    { code: 'ta', label: 'தமிழ்' },
-    { code: 'gu', label: 'ગુજરાતી' },
-    { code: 'pa', label: 'ਪੰਜਾਬੀ' },
-    { code: 'ml', label: 'മലയാളം' },
-    { code: 'ur', label: 'اردو' },
-  ];
-
   return (
-    <View style={styles.container}>
-      <View style={styles.topContainer}>
-        <Text style={styles.title}>Welcome to Truecaller</Text>
-        <Text style={styles.subtitle}>Pick your language to get started</Text>
+    <View style={commonStyles.container}>
+      <View style={commonStyles.topContainer}>
+        <Text style={commonStyles.title}>Welcome to Truecaller</Text>
+        <Text style={commonStyles.subtitle}>Pick your language to get started</Text>
       </View>
       
-      <ScrollView contentContainerStyle={styles.middleContainer}>
+      <ScrollView contentContainerStyle={[commonStyles.middleContainer, {paddingVertical: 90}]}>
         <View style={styles.languageGrid}>
           {languages.map((language, index) => (
-            <TouchableOpacity key={index} style={styles.languageButton} onPress={() => navigation.navigate('Info')}>
+            <TouchableOpacity key={index} style={styles.languageButton} onPress={() => navigation.navigate('Info', { language: language.label })}>
               <Text style={styles.languageText}>{language.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
-      <View style={styles.bottomContainer}>
+      <View style={commonStyles.bottomContainer}>
         <Text style={styles.footerText}>Choose another language</Text>
       </View>
     </View>
@@ -71,23 +29,11 @@ const LanguageSelection = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginVertical: 10,
-    textAlign: "center"
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 20,
-    textAlign: "center"
-  },
   languageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    alignItems: 'center',
     gap:30
   },
   languageButton: {
@@ -110,33 +56,6 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     textDecorationLine: 'underline',
     textAlign : "center"
-  },
-  container: {
-    flex: 1, // Full screen height
-    backgroundColor: '#f8f8f8',
-    margin:10
-  },
-  topContainer: {
-    height: 60, // Fixed height for the top container
-    // backgroundColor: '#4caf50',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  middleContainer: {
-    flexGrow: 1, // Dynamically fill available space
-    padding: 20,
-    flex:1,
-    // backgroundColor: '#2196f3',
-    alignItems: 'center',
-    flexDirection : 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center'
-  },
-  bottomContainer: {
-    height: 40, // Fixed height for the bottom container
-    // backgroundColor: '#ff5722',
-    justifyContent: 'center',
-    alignItems: 'center',
   }
 });
 

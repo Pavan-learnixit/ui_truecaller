@@ -1,43 +1,38 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
-import CallLogs from 'react-native-call-log';
-import FeatherIcon from 'react-native-vector-icons/Feather';
+import Contacts from 'react-native-contacts';
 
-const Home = ({ navigation }) => {
-  const [callLogs, setCallLogs] = React.useState([]);
+const ContactsInfo = () => {
+  const [contactDetails, setContactDetails] = React.useState([]);
 
   React.useEffect(() => {
-    const fetchCallLogs = async () => {
-      if (Platform.OS === 'android') {
-        const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
-        );
-
-        if (!hasPermission) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
-          );
-          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('Call log permission denied');
-            return;
-          }
-        }
-
-        try {
-          const logs = await CallLogs.loadAll();
-          console.log("logs", logs);
-          
-          setCallLogs(logs);
-        } catch (error) {
-          console.error('Error fetching call logs:', error);
-        }
-      } else {
-        console.log('Call logs are not supported on iOS');
+    const fetchContacts = async () => {
+      const hasPermission = await requestContactsPermission();
+      if (hasPermission) {
+        Contacts.getAll()
+          .then(fetchedContacts => setContactDetails(fetchedContacts))
+          .catch(error => console.error('Error fetching contacts:', error));
       }
     };
 
-    fetchCallLogs();
+    fetchContacts();
   }, []);
+
+  const requestContactsPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        {
+          title: 'Contacts Permission',
+          message: 'This app would like to access your contacts.',
+          buttonPositive: 'OK',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } else {
+      return true;
+    }
+  };
 
   const renderContactItem = ({ item }) => (
     <View style={styles.contactItem}>
@@ -45,15 +40,14 @@ const Home = ({ navigation }) => {
         <Image source={{ uri: item.image }} style={styles.contactImage} />
       ) : (
         <View style={styles.contactInitial}>
-          <Text style={styles.contactInitialText}>{item.name[0] || 'Unknown'}</Text>
+          <Text style={styles.contactInitialText}>{item.displayName[0]}</Text>
         </View>
       )}
       <View style={styles.contactInfo}>
-        <Text style={styles.contactName}>{item.name}</Text>
-        {/* <Text style={styles.contactType}>{item.phoneNumber}</Text> */}
-        <Text style={[styles.contactType]}><FeatherIcon name={item.type?.includes('OUT')? 'arrow-up-right' : 'arrow-down-left'} size={20}/>{item.type}</Text>
+        <Text style={styles.contactName}>{item.displayName}</Text>
+        {/* <Text style={styles.contactType}>{item.type}</Text> */}
       </View>
-      <Text style={styles.contactTime}>{item.duration} sec</Text>
+      {/* <Text style={styles.contactTime}>{item.time}</Text> */}
     </View>
   );
 
@@ -66,19 +60,6 @@ const Home = ({ navigation }) => {
           placeholder="Search numbers, names & more"
           placeholderTextColor="#aaa"
         />
-      </View>
-
-      {/* Top Navigation Buttons */}
-      <View style={styles.topButtons}>
-        <TouchableOpacity style={styles.topButton} onPress={() => navigation.navigate('Contacts')}>
-          <Text style={styles.topButtonText}>Contacts</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.topButton}>
-          <Text style={styles.topButtonText}>Favourites</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.topButton}>
-          <Text style={styles.topButtonText}>Voice HD</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Spam Warning */}
@@ -94,8 +75,8 @@ const Home = ({ navigation }) => {
 
       {/* Contact List */}
       <FlatList
-        data={callLogs}
-        keyExtractor={(item, index) => index.toString()}
+        data={contactDetails}
+        keyExtractor={(item) => item.recordID}
         renderItem={renderContactItem}
         contentContainerStyle={styles.contactList}
       />
@@ -211,4 +192,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default ContactsInfo;

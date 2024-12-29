@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 const Splash = ({navigation}) => {
     useEffect(()=>{
         setTimeout(()=>{
-            navigation.navigate('Parent')
+            navigation.navigate('Language')
         },2000)
     },[])
   return (

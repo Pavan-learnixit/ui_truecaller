@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { BaseButton } from 'react-native-gesture-handler';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { languages } from '../assets/data/Data';
+import MatIcon from 'react-native-vector-icons/MaterialIcons';
 
 const width = Dimensions.get('window').width;
 
@@ -24,9 +25,9 @@ function Slider({ navigation, route }) {
     };
 
     const carouselItems = [
-        { bgColor: 'green', title: 'Know who is calling you', icon: 'person-sharp' },
-        { bgColor: 'red', title: 'Protect from spam', icon: 'alert-circle-outline' },
-        { bgColor: 'blue', title: 'Categories you SMS inbox for spam alert', icon: 'textsms' },
+        { bgColor: 'green', title: 'Know who is calling you', icon: <Icon name='person-sharp' size={100} color="white" /> },
+        { bgColor: 'red', title: 'Protect from spam', icon:<Icon name='alert-circle-outline' size={100} color="white" /> },
+        { bgColor: 'blue', title: 'Categories you SMS inbox for spam alert', icon: <MatIcon name="message" size={100} color="white" /> },
       ];
 
     const requestPermissions = async () => {
@@ -63,6 +64,7 @@ function Slider({ navigation, route }) {
                 height={width}
                 autoPlay={true}
 <<<<<<< HEAD
+<<<<<<< HEAD
                 data={[...new Array(6).keys()]}
                 scrollAnimationDuration={1000}
                 onSnapToItem={(index) => console.log('current index:', index)}
@@ -80,6 +82,8 @@ function Slider({ navigation, route }) {
                             {index}
                         </Text>
 =======
+=======
+>>>>>>> 84e27ffb5aa187b9c60bdac0f52e0c473fa962fa
                 data={carouselItems}
                 scrollAnimationDuration={3000}
                 // onSnapToItem={(index) => console.log('current index:', index)}
@@ -87,9 +91,12 @@ function Slider({ navigation, route }) {
                     <View style={{flex:1,justifyContent: 'center', alignItems: 'center'}}>
                         <Text style={styles.text}>{item.title}</Text>
                             <View style={[styles.card, styles.image, { backgroundColor: item.bgColor}]}>
-                                <Icon name={item.icon} size={100} color="white" />
+                                {item.icon}
                             </View>
+<<<<<<< HEAD
 >>>>>>> 022473672509c070577bf6909dda1e60f9f14d13
+=======
+>>>>>>> 84e27ffb5aa187b9c60bdac0f52e0c473fa962fa
                     </View>
                 )}
             />
@@ -103,7 +110,7 @@ function Slider({ navigation, route }) {
                     style={{backgroundColor: 'green', padding: 10, borderRadius: 10, width: width/1.5, alignItems: 'center'}}
                     onPress={() => {
                         requestPermissions();
-                        navigation.navigate('Home')
+                        navigation.navigate('Parent')
                     }}
                 />
                 <Text style={styles.privacyText}>By clicking on 'Get Started' if you reside in EU, EEA or Switzerland you accept the <Text style={commonStyles.footerText}>Terms of service</Text> and if you reside in any other country you accept the <Text style={commonStyles.footerText}>Terms of service and Privacy Policy</Text></Text>
@@ -120,8 +127,11 @@ function Slider({ navigation, route }) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export default Slider;
 =======
+=======
+>>>>>>> 84e27ffb5aa187b9c60bdac0f52e0c473fa962fa
 
 const styles = StyleSheet.create({
     card: {
@@ -157,4 +167,7 @@ const styles = StyleSheet.create({
     })
 
 export default Slider;
+<<<<<<< HEAD
 >>>>>>> 022473672509c070577bf6909dda1e60f9f14d13
+=======
+>>>>>>> 84e27ffb5aa187b9c60bdac0f52e0c473fa962fa

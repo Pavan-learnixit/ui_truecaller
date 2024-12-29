@@ -1,4 +1,5 @@
 import React from 'react';
+// import CallerDetails from './components/CallerDetails/CallerDetails';
 import AppNavigator from './components/AppNavigator';
 // import { NavigationContainer } from '@react-navigation/native';
 // import { createStackNavigator } from '@react-navigation/stack';
@@ -10,7 +11,7 @@ import AppNavigator from './components/AppNavigator';
 
 const App = () => {
   return (
-
+    // <CallerDetails/>
     <AppNavigator/>
     // <NavigationContainer>
     //   <Stack.Navigator>

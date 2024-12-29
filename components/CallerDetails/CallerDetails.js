@@ -5,47 +5,40 @@ import MatIcon from 'react-native-vector-icons/MaterialIcons';
 
 const { width } = Dimensions.get('window');
 
-const CallerDetails = () => {
+const CallerDetails = ({ route }) => {
+  const { contact } = route.params;
+  console.log("contact", contact);
+  
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity>
-          <Icon name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>IN YOUR CONTACTS</Text>
-        <TouchableOpacity>
-          <Icon name="heart-outline" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-
       <View style={styles.profileContainer}>
         <Image
           source={{ uri: 'https://via.placeholder.com/150' }} // Placeholder for user image
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>Amith M</Text>
+        <Text style={styles.profileName}>{contact.displayName}</Text>
         <Text style={styles.callStatus}>On a call</Text>
       </View>
 
       <View style={styles.actionContainer}>
         <TouchableOpacity style={styles.actionButton}>
-          <Icon name="call" size={30} color="white" />
+          <Icon name="call" size={30} color="#007aff" />
           <Text style={styles.actionText}>Call</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Icon name="chatbubbles" size={30} color="white" />
+          <Icon name="chatbubbles" size={30} color="#007aff" />
           <Text style={styles.actionText}>Message</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Icon name="call-outline" size={30} color="white" />
+          <Icon name="call-outline" size={30} color="#007aff" />
           <Text style={styles.actionText}>Voice</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <MatIcon name="edit" size={30} color="white" />
+          <MatIcon name="edit" size={30} color="#007aff" />
           <Text style={styles.actionText}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Icon name="cash-outline" size={30} color="white" />
+          <Icon name="cash-outline" size={30} color="#007aff" />
           <Text style={styles.actionText}>Pay</Text>
         </TouchableOpacity>
       </View>
@@ -61,8 +54,13 @@ const CallerDetails = () => {
       </View>
 
       <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>095356 56560</Text>
-        <Text style={styles.infoSubText}>Mobile · Airtel</Text>
+        {contact.phoneNumbers.map((item) => (
+          <View key={item.id}>
+            <Text style={styles.infoText}>{item.number}</Text>
+            <Text style={styles.infoSubText}>{item.label} · Airtel</Text>
+          </View>
+        ))}
+        
       </View>
 
       <View style={styles.historyContainer}>
@@ -99,7 +97,7 @@ const CallerDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1c1c1c',
+    // backgroundColor: '#1c1c1c',
   },
   headerContainer: {
     flexDirection: 'row',
@@ -122,7 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   profileName: {
-    color: 'white',
+    // color: 'blue',
     fontSize: 20,
     marginTop: 10,
   },
@@ -139,7 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionText: {
-    color: 'white',
+    // color: 'white',
     marginTop: 5,
   },
   adContainer: {
@@ -171,18 +169,18 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333',
   },
   infoText: {
-    color: 'white',
+    // color: 'white',
     fontSize: 18,
   },
   infoSubText: {
-    color: 'gray',
+    // color: 'gray',
     fontSize: 14,
   },
   historyContainer: {
     padding: 15,
   },
   historyTitle: {
-    color: 'white',
+    // color: 'white',
     fontSize: 16,
     marginBottom: 10,
   },
@@ -190,7 +188,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   historyTime: {
-    color: 'white',
+    // color: 'white',
   },
   historyDetails: {
     color: 'gray',

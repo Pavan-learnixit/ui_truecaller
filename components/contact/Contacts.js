@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
 import Contacts from 'react-native-contacts';
 
-const ContactsInfo = () => {
+const ContactsInfo = ({ navigation }) => {
   const [contactDetails, setContactDetails] = React.useState([]);
 
   React.useEffect(() => {
@@ -35,6 +35,7 @@ const ContactsInfo = () => {
   };
 
   const renderContactItem = ({ item }) => (
+    <TouchableOpacity onPress={() => navigation.navigate('ContactDetails', { contact: item })}>
     <View style={styles.contactItem}>
       {item.image ? (
         <Image source={{ uri: item.image }} style={styles.contactImage} />
@@ -49,6 +50,7 @@ const ContactsInfo = () => {
       </View>
       {/* <Text style={styles.contactTime}>{item.time}</Text> */}
     </View>
+    </TouchableOpacity>
   );
 
   return (

@@ -10,6 +10,7 @@ const ContactsInfo = ({ navigation }) => {
       const hasPermission = await requestContactsPermission();
       if (hasPermission) {
         Contacts.getAll()
+        
           .then(fetchedContacts => setContactDetails(fetchedContacts))
           .catch(error => console.error('Error fetching contacts:', error));
       }

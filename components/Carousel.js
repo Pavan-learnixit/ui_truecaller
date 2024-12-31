@@ -4,11 +4,18 @@ import { Dimensions, Platform, StyleSheet, Text, View } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import commonStyles from '../assets/css/Style';
 import BottomPanel from './BottomPanel';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/root'
+
 import Icon from 'react-native-vector-icons/Ionicons';
 import { BaseButton } from 'react-native-gesture-handler';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { languages } from '../assets/data/Data';
 import MatIcon from 'react-native-vector-icons/MaterialIcons';
+import { translation } from '../assets/data/utils';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const width = Dimensions.get('window').width;
 
@@ -21,14 +28,52 @@ function Slider({ navigation, route }) {
 
     const handleLanguageSelect = (language) => {
         setSelectedLanguage(language);
+        saveSelectedLang(language)
         console.log('Selected Language:', language);
+        const datasss =    AsyncStorage.getItem("LANG")
+     console.log("ASYNC DATA", datasss)
     };
 
     const carouselItems = [
-        { bgColor: 'green', title: 'Know who is calling you', icon: <Icon name='person-sharp' size={100} color="white" /> },
-        { bgColor: 'red', title: 'Protect from spam', icon:<Icon name='alert-circle-outline' size={100} color="white" /> },
-        { bgColor: 'blue', title: 'Categories you SMS inbox for spam alert', icon: <MatIcon name="message" size={100} color="white" /> },
-      ];
+        {
+            bgColor: 'green',
+            title: selectedLanguage === "English" 
+              ? translation[1].English 
+              : selectedLanguage === "ಕನ್ನಡ" 
+              ? translation[1].Kannada 
+              : selectedLanguage === "हिंदी" 
+              ? translation[1].Hindi 
+              : selectedLanguage === "తెలుగు" 
+              ? translation[1].Telagu 
+              : selectedLanguage === "தமிழ்" 
+              ? translation[1].Tamil 
+              : null,
+            icon: <Icon name='person-sharp' size={100} color="white" />
+          },
+          
+        { bgColor: 'red',   title: selectedLanguage === "English" 
+            ? translation[2].English 
+            : selectedLanguage === "ಕನ್ನಡ" 
+            ? translation[2].Kannada 
+            : selectedLanguage === "हिंदी" 
+            ? translation[2].Hindi 
+            : selectedLanguage === "తెలుగు" 
+            ? translation[2].Telagu 
+            : selectedLanguage === "தமிழ்" 
+            ? translation[2].Tamil 
+            : null, icon: <Icon name='alert-circle-outline' size={100} color="white" /> },
+        { bgColor: 'blue', title: selectedLanguage === "English" 
+            ? translation[3].English 
+            : selectedLanguage === "ಕನ್ನಡ" 
+            ? translation[3].Kannada 
+            : selectedLanguage === "हिंदी" 
+            ? translation[3].Hindi 
+            : selectedLanguage === "తెలుగు" 
+            ? translation[3].Telagu 
+            : selectedLanguage === "தமிழ்" 
+            ? translation[3].Tamil 
+            : null, icon: <MatIcon name="message" size={100} color="white" /> },
+    ];
 
     const requestPermissions = async () => {
     if (Platform.OS === 'android') {
@@ -52,10 +97,15 @@ function Slider({ navigation, route }) {
     }
     };
 
+    const saveSelectedLang =  async(selectedLanguage)=>{
+        await AsyncStorage.setItem('LANG', selectedLanguage);
+     
+    }
+
     return (
         <View style={[commonStyles.container, {margin: 0}]} >
             <View style={commonStyles.topContainer}>
-                <Text style={commonStyles.title}>Truecaller</Text>
+                <Text style={commonStyles.title}>Lifeline</Text>
             </View>
             <View style={[commonStyles.middleContainer, styles.carouselContainer]}>
             <Carousel
@@ -81,18 +131,21 @@ function Slider({ navigation, route }) {
                 </Text>
                 <BaseButton 
                     children={
-                        <Text style={{ color: 'white', textTransform:'capitalize', fontSize: 18}}>
-                            Get started
-                        </Text>
+                        <Text style={styles.getStartedText}>{selectedLanguage=="English"?translation[0].English:selectedLanguage=="ಕನ್ನಡ"?translation[0].Kannada:selectedLanguage=="हिंदी"?translation[0].Hindi:selectedLanguage=="తెలుగు"?translation[0].Telagu:selectedLanguage=="தமிழ்"?translation[0].Tamil:null}</Text>
                     }
-                    rippleColor={'#f8f8f8'}
+                    // rippleColor={'#f8f8f8'}
                     style={{backgroundColor: 'green', padding: 10, borderRadius: 10, width: width/1.5, alignItems: 'center'}}
                     onPress={() => {
                         requestPermissions();
                         navigation.navigate('Parent')
                     }}
                 />
-                <Text style={styles.privacyText}>By clicking on 'Get Started' if you reside in EU, EEA or Switzerland you accept the <Text style={commonStyles.footerText}>Terms of service</Text> and if you reside in any other country you accept the <Text style={commonStyles.footerText}>Terms of service and Privacy Policy</Text></Text>
+                <Text style={styles.privacyText}>
+                    By clicking on 'Get Started' if you reside in EU, EEA or Switzerland you accept the
+                    <Text style={commonStyles.footerText}> Terms of service</Text> and if you reside in any
+                    other country you accept the
+                    <Text style={commonStyles.footerText}> Terms of service and Privacy Policy</Text>
+                </Text>
             </View>
             <BottomPanel 
                 visible={isBottomSheetVisible}
@@ -128,6 +181,12 @@ const styles = StyleSheet.create({
       carouselContainer:{
         paddingVertical: 90,
         paddingHorizontal: 0
+      },
+      getStartedText:{
+        color: 'white',
+        fontSize: 18,
+        // fontWeight: 'bold',
+        textTransform: 'uppercase'
       },
       carouselItemsContainer:{
         flex:1,

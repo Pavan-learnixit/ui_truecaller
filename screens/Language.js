@@ -2,20 +2,23 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import commonStyles from '../assets/css/Style';
 import { languages } from '../assets/data/Data';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LanguageSelection = ({ navigation }) => {
 
   return (
     <View style={commonStyles.container}>
       <View style={commonStyles.topContainer}>
-        <Text style={commonStyles.title}>Welcome to Truecaller</Text>
+        <Text style={commonStyles.title}>Welcome to Lifeline</Text>
         <Text style={commonStyles.subtitle}>Pick your language to get started</Text>
       </View>
       
       <ScrollView contentContainerStyle={[commonStyles.middleContainer, {paddingVertical: 90}]}>
         <View style={styles.languageGrid}>
           {languages.map((language, index) => (
-            <TouchableOpacity key={index} style={styles.languageButton} onPress={() => navigation.navigate('Info', { language: language.label })}>
+            <TouchableOpacity key={index} style={styles.languageButton} onPress={() => {
+              AsyncStorage.setItem("LANG", language.label)
+              navigation.navigate('Info', { language: language.label })}}>
               <Text style={styles.languageText}>{language.label}</Text>
             </TouchableOpacity>
           ))}

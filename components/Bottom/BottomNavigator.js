@@ -8,6 +8,7 @@ import Screen3 from './Screen3';
 import { Text } from 'react-native';
 import FoundIcon from 'react-native-vector-icons/Foundation';
 import Home from '../../screens/Home';
+import SMSReader from './SMSReader';
 
 const Bottom = createBottomTabNavigator();
 const BottomNavigator = () => {
@@ -33,7 +34,7 @@ const BottomNavigator = () => {
       )
     }
     }}/>
-    <Bottom.Screen name="Message" component={Screen3} options={{headerShown:false, tabBarIcon:()=>{
+    <Bottom.Screen name="Message" component={SMSReader} options={{headerShown:false, tabBarIcon:()=>{
       return(
         <Icon name="message" size={20} color="blue"/>
       );

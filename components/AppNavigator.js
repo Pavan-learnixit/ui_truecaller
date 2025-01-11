@@ -9,7 +9,9 @@ import Slider from './Carousel';
 import Home from '../screens/Home';
 import ContactsInfo from './contact/Contacts';
 import CallerDetails from './CallerDetails/CallerDetails';
+
 import Icon from 'react-native-vector-icons/Ionicons';
+import NewMessage from './Bottom/NewMessage';
 
 const Stack = createStackNavigator();
 
@@ -42,6 +44,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Parent" component={Parent} options={{headerShown:false}}/>
+        <Stack.Screen name="NewMessage" component={NewMessage} options={{headerShown:false}}/>
     </Stack.Navigator>
   </NavigationContainer>
   )

@@ -4,20 +4,20 @@ import Contacts from 'react-native-contacts';
 
 const ContactsInfo = ({ navigation }) => {
   const [contactDetails, setContactDetails] = React.useState([]);
-
+  
   React.useEffect(() => {
-    const fetchContacts = async () => {
-      const hasPermission = await requestContactsPermission();
-      if (hasPermission) {
-        Contacts.getAll()
-        
-          .then(fetchedContacts => setContactDetails(fetchedContacts))
-          .catch(error => console.error('Error fetching contacts:', error));
-      }
-    };
-
     fetchContacts();
-  }, []);
+  }, [contactDetails]);
+
+  const fetchContacts = async () => {
+    const hasPermission = await requestContactsPermission();
+    if (hasPermission) {
+      Contacts.getAll()
+      
+        .then(fetchedContacts => setContactDetails(fetchedContacts))
+        .catch(error => console.error('Error fetching contacts:', error));
+    }
+  };
 
   const requestContactsPermission = async () => {
     if (Platform.OS === 'android') {
@@ -54,6 +54,19 @@ const ContactsInfo = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+
+  const searchHandler = (text) => {
+    const filteredContacts = contactDetails.filter((contact) =>
+      contact.displayName.toLowerCase().includes(text.toLowerCase())
+    );
+    // console.log("text", text.length);
+    
+    if(text.length === 0) {
+      setContactDetails(contactDetails);
+    }else
+      setContactDetails(filteredContacts);
+  }
+
   return (
     <View style={styles.container}>
       {/* Search Bar */}
@@ -62,6 +75,7 @@ const ContactsInfo = ({ navigation }) => {
           style={styles.searchInput}
           placeholder="Search numbers, names & more"
           placeholderTextColor="#aaa"
+          onChangeText={searchHandler}
         />
       </View>
 

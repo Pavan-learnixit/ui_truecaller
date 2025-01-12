@@ -29,7 +29,7 @@ const Home = ({ navigation }) => {
 
         try {
           const logs = await CallLogs.loadAll();
-          console.log('logs', logs);
+          // console.log('logs', logs);
 
           setCallLogs(logs);
           sharedCallLogs.value = logs; // Update shared value
@@ -57,7 +57,7 @@ const Home = ({ navigation }) => {
         </View>
       )}
       <View style={styles.contactInfo}>
-        <Text style={styles.contactName}>{item.name}</Text>
+        <Text style={styles.contactName}>{item.name || item.phoneNumber}</Text>
         <Text style={[styles.contactType]}>
           <FeatherIcon
             name={item.type?.includes('OUT') ? 'arrow-up-right' : 'arrow-down-left'}
@@ -107,7 +107,7 @@ const Home = ({ navigation }) => {
 
       {/* Contact List */}
       <FlatList
-        data={derivedCallLogs.value} // Use derived value for rendering
+        data={callLogs} // Use derived value for rendering
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderContactItem}
         contentContainerStyle={styles.contactList}

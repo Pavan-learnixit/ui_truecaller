@@ -1,6 +1,7 @@
-import { View, Text, PermissionsAndroid, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, PermissionsAndroid, FlatList } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import SmsAndroid from 'react-native-get-sms-android';
+import { RenderItem } from '../Common';
 
 const SMSReader = ({ navigation }) => {
   const [smsList, setSmsList] = useState([]);
@@ -58,31 +59,6 @@ const SMSReader = ({ navigation }) => {
     fetchSms();
   }, []);
 
-  const renderItem = ({ item }) => {
-    return (
-      <TouchableOpacity
-        style={{
-          margin: 10,
-          padding: 10,
-          backgroundColor: '#f9f9f9',
-          borderRadius: 5,
-          shadowColor: '#000',
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          shadowOffset: { width: 0, height: 2 },
-          elevation: 3,
-        }}
-        onPress={() => navigation.navigate('NewMessage', { sms: item })}
-      >
-        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{item.address}</Text>
-        <Text style={{ fontSize: 14, marginVertical: 5 }}>{item.body}</Text>
-        <Text style={{ color: 'gray', fontSize: 10 }}>
-          {new Date(item.date).toLocaleString()}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <View style={{ flex: 1, padding: 20 }}>
       {loading ? (
@@ -93,7 +69,7 @@ const SMSReader = ({ navigation }) => {
         <FlatList
           data={smsList}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={renderItem}
+          renderItem={({ item }) => <RenderItem item={item} onPress={()=> navigation.navigate("NewMessage", {sms : item})} />}
           contentContainerStyle={{ paddingBottom: 20 }}
         />
       )}

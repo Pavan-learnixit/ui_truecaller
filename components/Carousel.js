@@ -79,13 +79,12 @@ function Slider({ navigation, route }) {
     if (Platform.OS === 'android') {
         try {
         // Request permissions for contacts
-        const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
         const callLogPermission = await request(PERMISSIONS.ANDROID.READ_CALL_LOG);
+        const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
         console.log('Contacts permission:', contactsPermission);
         
         if (
-            contactsPermission === RESULTS.GRANTED &&
-            callLogPermission === RESULTS.GRANTED
+            callLogPermission === RESULTS.GRANTED && contactsPermission === RESULTS.GRANTED 
         ) {
             console.log('Permissions granted for contacts and call logs');
         } else {

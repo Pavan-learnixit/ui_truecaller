@@ -44,7 +44,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Parent" component={Parent} options={{headerShown:false}}/>
-        <Stack.Screen name="NewMessage" component={NewMessage} options={{headerShown:false}}/>
+        <Stack.Screen name="NewMessage" component={NewMessage} options={{headerShown:true, title: 'Message'}}/>
     </Stack.Navigator>
   </NavigationContainer>
   )

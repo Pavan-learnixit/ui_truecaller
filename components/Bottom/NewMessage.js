@@ -10,6 +10,8 @@ const NewMessage = () => {
   useEffect(() => {
     // Extract SMS data from the route
     const { sms } = route.params || {};
+    console.log('SMS:', sms);
+    
 
     if (sms) {
       setMessages([

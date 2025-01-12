@@ -33,8 +33,8 @@ const SMSReader = ({ navigation }) => {
       if (hasPermission) {
         SmsAndroid.list(
           JSON.stringify({
-            box: 'inbox', // Specify 'inbox' to fetch received messages
-            maxCount: 30, // Limit the number of messages fetched
+            box: '', // Specify 'inbox' to fetch received messages
+            read: 1, // Limit the number of messages fetched
           }),
           fail => {
             console.error('Failed to fetch SMS:', fail);
@@ -43,6 +43,8 @@ const SMSReader = ({ navigation }) => {
           (count, smsList) => {
             try {
               const messages = JSON.parse(smsList);
+              console.log("messages", messages);
+              
               setSmsList(messages);
             } catch (error) {
               console.error('Error parsing SMS:', error);

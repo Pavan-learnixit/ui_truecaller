@@ -7,7 +7,7 @@ const { width } = Dimensions.get('window');
 
 const CallerDetails = ({ route }) => {
   const { contact } = route.params;
-  console.log("contact", contact);
+  // console.log("contact", contact);
   
   return (
     <ScrollView style={styles.container}>

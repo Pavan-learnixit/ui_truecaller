@@ -2,9 +2,13 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
 import CallLogs from 'react-native-call-log';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import { useSharedValue, useDerivedValue } from 'react-native-reanimated';
 
 const Home = ({ navigation }) => {
   const [callLogs, setCallLogs] = React.useState([]);
+
+  // Shared value to handle call logs safely
+  const sharedCallLogs = useSharedValue([]);
 
   React.useEffect(() => {
     const fetchCallLogs = async () => {
@@ -25,9 +29,10 @@ const Home = ({ navigation }) => {
 
         try {
           const logs = await CallLogs.loadAll();
-          console.log("logs", logs);
-          
+          // console.log('logs', logs);
+
           setCallLogs(logs);
+          sharedCallLogs.value = logs; // Update shared value
         } catch (error) {
           console.error('Error fetching call logs:', error);
         }
@@ -39,19 +44,27 @@ const Home = ({ navigation }) => {
     fetchCallLogs();
   }, []);
 
+  // Use derived value to read from shared value
+  const derivedCallLogs = useDerivedValue(() => sharedCallLogs.value, [sharedCallLogs]);
+
   const renderContactItem = ({ item }) => (
     <View style={styles.contactItem}>
       {item.image ? (
         <Image source={{ uri: item.image }} style={styles.contactImage} />
       ) : (
         <View style={styles.contactInitial}>
-          <Text style={styles.contactInitialText}>{item.name[0] || 'Unknown'}</Text>
+          <Text style={styles.contactInitialText}>{item.name?.[0] || 'U'}</Text>
         </View>
       )}
       <View style={styles.contactInfo}>
-        <Text style={styles.contactName}>{item.name}</Text>
-        {/* <Text style={styles.contactType}>{item.phoneNumber}</Text> */}
-        <Text style={[styles.contactType]}><FeatherIcon name={item.type?.includes('OUT')? 'arrow-up-right' : 'arrow-down-left'} size={20}/>{item.type}</Text>
+        <Text style={styles.contactName}>{item.name || item.phoneNumber}</Text>
+        <Text style={[styles.contactType]}>
+          <FeatherIcon
+            name={item.type?.includes('OUT') ? 'arrow-up-right' : 'arrow-down-left'}
+            size={20}
+          />
+          {item.type}
+        </Text>
       </View>
       <Text style={styles.contactTime}>{item.duration} sec</Text>
     </View>
@@ -94,7 +107,7 @@ const Home = ({ navigation }) => {
 
       {/* Contact List */}
       <FlatList
-        data={callLogs}
+        data={callLogs} // Use derived value for rendering
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderContactItem}
         contentContainerStyle={styles.contactList}
@@ -194,20 +207,6 @@ const styles = StyleSheet.create({
   contactTime: {
     fontSize: 14,
     color: '#999',
-  },
-  bottomNavigation: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: '#ddd',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navText: {
-    fontSize: 14,
-    color: '#555',
   },
 });
 

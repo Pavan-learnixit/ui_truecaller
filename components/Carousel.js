@@ -14,6 +14,7 @@ import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { languages } from '../assets/data/Data';
 import MatIcon from 'react-native-vector-icons/MaterialIcons';
 import { translation } from '../assets/data/utils';
+import RingingCard from './RingingCard';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -34,9 +35,15 @@ function Slider({ navigation, route }) {
      console.log("ASYNC DATA", datasss)
     };
 
+    const DATA = [
+        { id: '1', callerName: 'John Doe', callerNumber: '+123456789' },
+        { id: '2', callerName: 'Jane Smith', callerNumber: '+987654321' },
+        { id: '3', callerName: 'Sam Wilson', callerNumber: '+112233445' },
+    ];
+
     const carouselItems = [
         {
-            bgColor: 'green',
+            bgColor: '#2a3e69',
             title: selectedLanguage === "English" 
               ? translation[1].English 
               : selectedLanguage === "ಕನ್ನಡ" 
@@ -48,10 +55,12 @@ function Slider({ navigation, route }) {
               : selectedLanguage === "தமிழ்" 
               ? translation[1].Tamil 
               : null,
-            icon: <Icon name='person-sharp' size={100} color="white" />
+            icon: <Icon name='person-sharp' size={40} color="white" />,
+            desc:"123 777 789",
+            iconBg: "#445987"
           },
           
-        { bgColor: 'red',   title: selectedLanguage === "English" 
+        { bgColor: '#b03131',   title: selectedLanguage === "English" 
             ? translation[2].English 
             : selectedLanguage === "ಕನ್ನಡ" 
             ? translation[2].Kannada 
@@ -61,8 +70,11 @@ function Slider({ navigation, route }) {
             ? translation[2].Telagu 
             : selectedLanguage === "தமிழ்" 
             ? translation[2].Tamil 
-            : null, icon: <Icon name='alert-circle-outline' size={100} color="white" /> },
-        { bgColor: 'blue', title: selectedLanguage === "English" 
+            : null, icon: <Icon name='alert-circle-outline' size={50} color="white" />,
+             desc:"Fraud",
+             iconBg : "#f0bdbd"
+        },
+        { bgColor: '#3838b0', title: selectedLanguage === "English" 
             ? translation[3].English 
             : selectedLanguage === "ಕನ್ನಡ" 
             ? translation[3].Kannada 
@@ -72,20 +84,22 @@ function Slider({ navigation, route }) {
             ? translation[3].Telagu 
             : selectedLanguage === "தமிழ்" 
             ? translation[3].Tamil 
-            : null, icon: <MatIcon name="message" size={100} color="white" /> },
+            : null, icon: <MatIcon name="message" size={50} color="white" />,
+            desc:"Message",
+            iconBg : "#7676e3"
+        },
     ];
 
     const requestPermissions = async () => {
     if (Platform.OS === 'android') {
         try {
         // Request permissions for contacts
-        const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
         const callLogPermission = await request(PERMISSIONS.ANDROID.READ_CALL_LOG);
+        const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
         console.log('Contacts permission:', contactsPermission);
         
         if (
-            contactsPermission === RESULTS.GRANTED &&
-            callLogPermission === RESULTS.GRANTED
+            callLogPermission === RESULTS.GRANTED && contactsPermission === RESULTS.GRANTED 
         ) {
             console.log('Permissions granted for contacts and call logs');
         } else {
@@ -117,12 +131,7 @@ function Slider({ navigation, route }) {
                 scrollAnimationDuration={3000}
                 // onSnapToItem={(index) => console.log('current index:', index)}
                 renderItem={({ item }) => (
-                    <View style={[styles.carouselItemsContainer]}>
-                        <Text style={styles.text}>{item.title}</Text>
-                            <View style={[styles.card, styles.image, { backgroundColor: item.bgColor}]}>
-                                {item.icon}
-                            </View>
-                    </View>
+                    <RingingCard item={item} />
                 )}
             />
             </View>

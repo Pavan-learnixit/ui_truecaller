@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
 import Contacts from 'react-native-contacts';
+import { RenderItem } from '../Common';
 
 const ContactsInfo = ({ navigation }) => {
   const [contactDetails, setContactDetails] = React.useState([]);
@@ -35,24 +36,7 @@ const ContactsInfo = ({ navigation }) => {
     }
   };
 
-  const renderContactItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('ContactDetails', { contact: item })}>
-    <View style={styles.contactItem}>
-      {item.image ? (
-        <Image source={{ uri: item.image }} style={styles.contactImage} />
-      ) : (
-        <View style={styles.contactInitial}>
-          <Text style={styles.contactInitialText}>{item.displayName[0]}</Text>
-        </View>
-      )}
-      <View style={styles.contactInfo}>
-        <Text style={styles.contactName}>{item.displayName}</Text>
-        {/* <Text style={styles.contactType}>{item.type}</Text> */}
-      </View>
-      {/* <Text style={styles.contactTime}>{item.time}</Text> */}
-    </View>
-    </TouchableOpacity>
-  );
+  
 
 
   const searchHandler = (text) => {
@@ -94,7 +78,7 @@ const ContactsInfo = ({ navigation }) => {
       <FlatList
         data={contactDetails}
         keyExtractor={(item) => item.recordID}
-        renderItem={renderContactItem}
+        renderItem={({ item }) => <RenderItem item={item} onPress={()=> navigation.navigate("ContactDetails", {contact : item})} />}
         contentContainerStyle={styles.contactList}
       />
     </View>

@@ -11,7 +11,7 @@ const DrawerNavigator = () => {
    <Drawer.Navigator screenOptions={{
       headerShown: true, // Show header by default
     }} drawerContent={props => <CutomDrawer {...props}/>}>
-    <Drawer.Screen name='Main' component={Main} options={{headerShown:true}}/>
+    <Drawer.Screen name='Main' component={Main} options={{headerShown:false}}/>
    </Drawer.Navigator>
   )
 }

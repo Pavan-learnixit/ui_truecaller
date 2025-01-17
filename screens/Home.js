@@ -1,12 +1,27 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, PermissionsAndroid, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  StyleSheet,
+  PermissionsAndroid,
+  Platform,
+  Modal
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 import CallLogs from 'react-native-call-log';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import { useSharedValue, useDerivedValue } from 'react-native-reanimated';
+import {useSharedValue, useDerivedValue} from 'react-native-reanimated';
+import Favourates from './Favourates';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const Home = ({ navigation }) => {
+const Home = ({navigation}) => {
   const [callLogs, setCallLogs] = React.useState([]);
-
+ const [openModal, setOpenModel] = React.useState(false);
   // Shared value to handle call logs safely
   const sharedCallLogs = useSharedValue([]);
 
@@ -14,12 +29,12 @@ const Home = ({ navigation }) => {
     const fetchCallLogs = async () => {
       if (Platform.OS === 'android') {
         const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
+          PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
         );
 
         if (!hasPermission) {
           const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
+            PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
           );
           if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
             console.log('Call log permission denied');
@@ -29,7 +44,7 @@ const Home = ({ navigation }) => {
 
         try {
           const logs = await CallLogs.loadAll();
-          console.log('logs', logs);
+          // console.log('logs', logs);
 
           setCallLogs(logs);
           sharedCallLogs.value = logs; // Update shared value
@@ -45,12 +60,15 @@ const Home = ({ navigation }) => {
   }, []);
 
   // Use derived value to read from shared value
-  const derivedCallLogs = useDerivedValue(() => sharedCallLogs.value, [sharedCallLogs]);
+  const derivedCallLogs = useDerivedValue(
+    () => sharedCallLogs.value,
+    [sharedCallLogs],
+  );
 
-  const renderContactItem = ({ item }) => (
+  const renderContactItem = ({item}) => (
     <View style={styles.contactItem}>
       {item.image ? (
-        <Image source={{ uri: item.image }} style={styles.contactImage} />
+        <Image source={{uri: item.image}} style={styles.contactImage} />
       ) : (
         <View style={styles.contactInitial}>
           <Text style={styles.contactInitialText}>{item.name?.[0] || 'U'}</Text>
@@ -60,7 +78,9 @@ const Home = ({ navigation }) => {
         <Text style={styles.contactName}>{item.name}</Text>
         <Text style={[styles.contactType]}>
           <FeatherIcon
-            name={item.type?.includes('OUT') ? 'arrow-up-right' : 'arrow-down-left'}
+            name={
+              item.type?.includes('OUT') ? 'arrow-up-right' : 'arrow-down-left'
+            }
             size={20}
           />
           {item.type}
@@ -69,7 +89,97 @@ const Home = ({ navigation }) => {
       <Text style={styles.contactTime}>{item.duration} sec</Text>
     </View>
   );
+ function renderModel() {
+    return (
+      <Modal visible={openModal} animationType="fade" transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-start',
+            alignItems: 'flex-end',
+            // backgroundColor: transperent,
+          }}>
+          <View
+            style={{backgroundColor: 'white', padding: 15, borderRadius: 10}}>
+            <TouchableOpacity
+              style={{alignItems: 'flex-end'}}
+              onPress={() => setOpenModel(false)}>
+              <Ionicons name="close" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="arrow-up-outline" size={24} color="green" />
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                  Outgoing calls
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="arrow-down-outline" size={24} color="red" />
 
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                  Incoming calls
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="call-outline" size={20} color="red" />
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                  Missed calls
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="ban-outline" size={20} color="red" />
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                  Blocked calls
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="trash-outline" size={20} color="red" />
+
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                  Delete all calls
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+            <View style={{flexDirection: 'row'}}>
+            <Ionicons name="call-outline" size={20} color="black" />
+            <Text style={{fontSize: 18, marginBottom: 5,marginLeft: 8}}>Set default sim</Text>
+            </View>
+              
+            </TouchableOpacity>
+            <TouchableOpacity>
+            <View style={{flexDirection: 'row'}}>
+            <Ionicons name="clipboard-outline" size={20} color="black" />
+
+            <Text style={{fontSize: 18, marginBottom: 5,marginLeft: 8}}>
+                Paste
+              </Text>
+            </View>
+             
+            </TouchableOpacity>
+            <TouchableOpacity>
+            <View style={{flexDirection: 'row'}}>
+            <Ionicons name="settings-outline" size={20} color="black" />
+
+            <Text style={{fontSize: 18, marginBottom: 5,marginLeft: 8}}>
+                Settings
+              </Text>
+            </View>  
+             
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
   return (
     <View style={styles.container}>
       {/* Search Bar */}
@@ -79,17 +189,40 @@ const Home = ({ navigation }) => {
           placeholder="Search numbers, names & more"
           placeholderTextColor="#aaa"
         />
+       
+<TouchableOpacity style={{   
+  // flex: 1,
+  position:'absolute',
+    flexDirection: 'row', // Arrange items in a row
+    justifyContent: 'flex-end', // Push to the right
+    alignItems: 'center', // Center vertically
+    padding: 10,
+    top:9,
+    right:10
+     }}
+     onPress={() => setOpenModel(true)}>
+<Ionicons  name="ellipsis-vertical" size={24} color="#000" />
+
+</TouchableOpacity>
+{renderModel()}
       </View>
 
       {/* Top Navigation Buttons */}
       <View style={styles.topButtons}>
-        <TouchableOpacity style={styles.topButton} onPress={() => navigation.navigate('Contacts')}>
+        <TouchableOpacity
+          style={styles.topButton}
+          onPress={() => navigation.navigate('Contacts')}>
+          <Ionicons name="people" size={24} color="black" />
           <Text style={styles.topButtonText}>Contacts</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.topButton}>
+        <TouchableOpacity
+          style={styles.topButton}
+          onPress={() => navigation.navigate('Favourates')}>
+          <Ionicons name="heart" size={24} color="black" />
           <Text style={styles.topButtonText}>Favourites</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.topButton}>
+          <Ionicons name="videocam" size={24} color="black" />
           <Text style={styles.topButtonText}>Voice HD</Text>
         </TouchableOpacity>
       </View>
@@ -137,9 +270,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingVertical: 10,
     backgroundColor: '#f9f9f9',
+    borderRadius: 10,
   },
   topButton: {
     alignItems: 'center',
+    backgroundColor: '#ccc',
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 10,
+    paddingBottom: 8,
+    paddingTop: 8,
   },
   topButtonText: {
     fontSize: 14,

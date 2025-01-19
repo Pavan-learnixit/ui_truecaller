@@ -9,7 +9,7 @@ export const truncateText = (text, maxLength) => {
     return text;
 };
 
-export function RenderItem({ item, onPress, route }) {
+export function RenderItem({ item, onPress, route }) {  
     return(
   <TouchableOpacity onPress={() => onPress(item, route)}>
 
@@ -26,7 +26,7 @@ export function RenderItem({ item, onPress, route }) {
       </View>
     )}
     <View style={styles.contactInfo}>
-      <Text style={styles.contactName}>{item.displayName || item.address}</Text>
+      <Text style={styles.contactName}>{item.displayName || item}</Text>
       {item.body && 
             <Text style={{ fontSize: 14, marginVertical: 5 }}>{truncateText(item.body, 40)}</Text>
         }

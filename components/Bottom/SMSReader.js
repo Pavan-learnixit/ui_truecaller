@@ -1,64 +1,74 @@
-import { View, Text, PermissionsAndroid, FlatList } from 'react-native';
+import { View, Text, PermissionsAndroid, FlatList, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import SmsAndroid from 'react-native-get-sms-android';
 import { RenderItem } from '../Common';
 
 const SMSReader = ({ navigation }) => {
   const [smsList, setSmsList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [filteredContact, setFilteredContact] = useState('');
 
-  async function requestSmsPermissions() {
+
+  const seacrhContact = (text) => {
+    setFilteredContact(text);
+    const filteredData = Object.keys(smsList).filter((item) => item.includes(text));
+    const filteredDataObj = filteredData.reduce((acc, item) => {
+      acc[item] = smsList[item];
+      return acc;
+    }, {});
+    setSmsList(filteredDataObj);
+  };
+
+  
+
+  const requestSmsPermissions = async () => {
     try {
-      const granted = await PermissionsAndroid.request(
+      const granted = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.READ_SMS,
-        {
-          title: 'SMS Permission',
-          message: 'This app needs access to your SMS messages to display them.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch (error) {
-      console.error('Permission error:', error);
-      return false;
-    }
-  }
+        PermissionsAndroid.PERMISSIONS.SEND_SMS,
+        PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+      ]);
 
-  useEffect(() => {
-    const fetchSms = async () => {
-      setLoading(true); // Start loading
-      const hasPermission = await requestSmsPermissions();
-      if (hasPermission) {
-        SmsAndroid.list(
-          JSON.stringify({
-            box: '', // Specify 'inbox' to fetch received messages
-            read: 1, // Limit the number of messages fetched
-          }),
-          fail => {
-            console.error('Failed to fetch SMS:', fail);
-            setLoading(false);
-          },
-          (count, smsList) => {
-            try {
-              const messages = JSON.parse(smsList);
-              console.log("messages", messages);
-              
-              setSmsList(messages);
-            } catch (error) {
-              console.error('Error parsing SMS:', error);
-            }
-            setLoading(false); // Stop loading
-          },
-        );
+      if (
+        granted[PermissionsAndroid.PERMISSIONS.READ_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted[PermissionsAndroid.PERMISSIONS.SEND_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] === PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        console.log('SMS permissions granted');
       } else {
-        console.log('SMS permission denied');
-        setLoading(false); // Stop loading
+        Alert.alert('Permissions Denied', 'SMS permissions are required to use this app.');
       }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const fetchMessages = () => {
+    const filter = {
+      box: 'inbox', // 'inbox' or 'sent'
+      read: 1, // 0 for unread messages, 1 for read messages
     };
 
-    fetchSms();
+    SmsAndroid.list(
+      JSON.stringify(filter),
+      (fail) => {
+        console.log('Failed with this error: ' + fail);
+      },
+      (count, smsList) => {
+        const messages = JSON.parse(smsList);
+        const groupedMessages = messages.reduce((acc, message) => {
+          if (!acc[message.address]) acc[message.address] = [];
+          acc[message.address].push(message);
+          return acc;
+        }, {});        
+        setSmsList(groupedMessages);
+      }
+    );
+  };
+
+  useEffect(() => {
+    requestSmsPermissions();
+    fetchMessages();
   }, []);
 
   return (
@@ -68,12 +78,21 @@ const SMSReader = ({ navigation }) => {
       ) : smsList.length === 0 ? (
         <Text>No SMS Found</Text>
       ) : (
+        <View>
+          <TextInput
+            // style={styles.searchInput}
+            placeholder="Search numbers, names & more"
+            placeholderTextColor="#aaa"
+            value={filteredContact}
+            onChangeText={seacrhContact}
+          />
         <FlatList
-          data={smsList}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => <RenderItem item={item} onPress={()=> navigation.navigate("NewMessage", {sms : item})} />}
+          data={Object.keys(smsList)}
+          keyExtractor={(item) =>item}
+          renderItem={({ item }) => <RenderItem item={item} smsList={Object.keys(smsList)} onPress={()=> navigation.navigate("NewMessage", {sms : item, smsList : smsList})} />}
           contentContainerStyle={{ paddingBottom: 20 }}
         />
+        </View>
       )}
     </View>
   );

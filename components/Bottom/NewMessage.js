@@ -1,65 +1,101 @@
-import { View } from 'react-native';
+import { Alert, Button, FlatList, NativeModules, StyleSheet, Text, TextInput, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { GiftedChat } from 'react-native-gifted-chat';
 import { useRoute } from '@react-navigation/native';
+const { SmsModule } = NativeModules;
 
 const NewMessage = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState({});
   const route = useRoute();
+  const [newMessage, setNewMessage] = useState('');
+  const [selectedSender, setSelectedSender] = useState('');
 
   useEffect(() => {
     // Extract SMS data from the route
-    const { sms } = route.params || {};
-    console.log('SMS:', sms);
+    const { sms, smsList } = route.params || {};
+    setSelectedSender(sms);
     
-
-    if (sms) {
-      setMessages([
-        {
-          _id: sms.date, // Use unique ID (date or another unique property)
-          text: sms.body, // SMS content
-          createdAt: new Date(sms.date), // Convert date to proper Date format
-          user: {
-            _id: 2, // Assume SMS sender has ID 2
-            name: sms.address || 'Unknown Sender', // SMS sender address
-            avatar: 'https://placeimg.com/140/140/any', // Default avatar
-          },
-        },
-      ]);
-    } else {
-      // Default message if no SMS is passed
-      setMessages([
-        {
-          _id: 1,
-          text: 'No SMS available',
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'System',
-            avatar: 'https://placeimg.com/140/140/any',
-          },
-        },
-      ]);
-    }
+    setMessages(smsList[sms]);
   }, [route.params]);
 
-  const onSend = (messageArray) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messageArray)
-    );
+
+  const checkDefaultSmsApp = async () => {
+    console.log(SmsManager, 'SmsManager');
+    
+    if (SmsManager && SmsManager.isDefaultSmsApp) {
+      const isDefault = await SmsManager.isDefaultSmsApp();
+      if (!isDefault) {
+        Alert.alert(
+          'Set Default SMS App',
+          'This app needs to be set as the default SMS app to manage messages. Would you like to set it now?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Set Default',
+              onPress: () => SmsManager.requestDefaultSmsApp(),
+            },
+          ]
+        );
+      }
+    }
+  };
+  
+  const sendSms = async () => {
+    try {
+      const result = await SmsModule.sendSms('7815058420', newMessage);
+      console.log(result); // SMS sent successfully
+      Alert.alert('Success', 'Message sent successfully');
+    } catch (error) {
+      console.error(error.message); // Handle error
+    }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <GiftedChat
-        messages={messages}
-        onSend={(messages) => onSend(messages)}
-        user={{
-          _id: 1, // Current user ID
-        }}
-      />
-    </View>
+    <View style={styles.messageContainer}>
+          <Text style={styles.subtitle}>Messages from: {selectedSender}</Text>
+          <FlatList
+            data={messages}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => {
+              return(
+              <Text style={styles.messageText}>{item.body}</Text>
+            )}}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Type your message"
+            value={newMessage}
+            onChangeText={setNewMessage}
+          />
+          <Button
+            title="Send Message"
+            onPress={() => {
+              if (newMessage.trim()) {
+                sendSms()
+                setNewMessage('');
+              } else {
+                Alert.alert('Error', 'Message cannot be empty');
+              }
+            }}
+          />
+        </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
+  senderContainer: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  sender: { fontSize: 18, color: 'blue' },
+  messageContainer: { marginTop: 20 },
+  subtitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  messageText: { fontSize: 16, marginBottom: 5 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+});
 
 export default NewMessage;

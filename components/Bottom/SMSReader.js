@@ -45,7 +45,7 @@ const SMSReader = ({ navigation }) => {
 
   const fetchMessages = () => {
     const filter = {
-      box: 'inbox', // 'inbox' or 'sent'
+      box: '', // 'inbox' or 'sent'
       read: 1, // 0 for unread messages, 1 for read messages
     };
 

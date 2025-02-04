@@ -9,21 +9,27 @@ import {
   StyleSheet,
   PermissionsAndroid,
   Platform,
-  Modal
+  Modal,
+  Alert,
+  NativeModules
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import CallLogs from 'react-native-call-log';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import {useSharedValue, useDerivedValue} from 'react-native-reanimated';
-import Favourates from './Favourates';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import uuid from 'react-native-uuid';
+
+const { DirectCall } = NativeModules;
+
 
 const Home = ({navigation}) => {
   const [callLogs, setCallLogs] = React.useState([]);
  const [openModal, setOpenModel] = React.useState(false);
   // Shared value to handle call logs safely
-  const sharedCallLogs = useSharedValue([]);
+
+
+  const generateKey = () => uuid.v4();
 
   React.useEffect(() => {
     const fetchCallLogs = async () => {
@@ -45,9 +51,11 @@ const Home = ({navigation}) => {
         try {
           const logs = await CallLogs.loadAll();
           // console.log('logs', logs);
-
-          setCallLogs(logs);
-          sharedCallLogs.value = logs; // Update shared value
+          const callLogsWithIds = logs.map(item => ({
+            ...item,
+            id: generateKey(),
+          }));
+          setCallLogs(callLogsWithIds);
         } catch (error) {
           console.error('Error fetching call logs:', error);
         }
@@ -59,11 +67,43 @@ const Home = ({navigation}) => {
     fetchCallLogs();
   }, []);
 
-  // Use derived value to read from shared value
-  const derivedCallLogs = useDerivedValue(
-    () => sharedCallLogs.value,
-    [sharedCallLogs],
-  );
+  const requestCallPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+        {
+          title: 'Call Permission',
+          message: 'This app needs access to your phone to make calls.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
+
+  const handleCall = async (phoneNumber) => {
+    const hasPermission = await requestCallPermission();
+    console.log('hasPermission', hasPermission);
+    
+    if (!hasPermission) {
+      await requestCallPermission();
+      Alert.alert('Permission Denied', 'Cannot make a call without permission.');
+      return;
+    }
+  
+    try {
+      DirectCall.callNumber(phoneNumber); // Initiates the call directly
+    } catch (error) {
+      console.error('Error making a call:', error);
+      Alert.alert('Error', 'Unable to make a direct call.');
+    }
+  };
 
   const renderContactItem = ({item}) => (
     <View style={styles.contactItem}>
@@ -86,7 +126,9 @@ const Home = ({navigation}) => {
           {item.type}
         </Text>
       </View>
-      <Text style={styles.contactTime}>{item.duration} sec</Text>
+      <TouchableOpacity style={styles.contactTime} onPress={() => handleCall(item.phoneNumber)}>
+        <Icon name="call" size={20} color="#000" />
+      </TouchableOpacity>
     </View>
   );
  function renderModel() {
@@ -241,7 +283,7 @@ const Home = ({navigation}) => {
       {/* Contact List */}
       <FlatList
         data={callLogs} // Use derived value for rendering
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id?.toString()}
         renderItem={renderContactItem}
         contentContainerStyle={styles.contactList}
       />
@@ -345,8 +387,8 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   contactTime: {
-    fontSize: 14,
-    color: '#999',
+    paddingHorizontal : 15,
+    fontSize: 14
   },
 });
 

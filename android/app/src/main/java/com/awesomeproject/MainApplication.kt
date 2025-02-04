@@ -14,6 +14,7 @@ import com.facebook.soloader.SoLoader
 
 // Import your custom package
 import com.awesomeproject.SmsPackage
+import com.awesomeproject.DirectCallPackage
 
 class MainApplication : Application(), ReactApplication {
 
@@ -23,6 +24,7 @@ class MainApplication : Application(), ReactApplication {
             PackageList(this).packages.apply {
               // Add your custom SMS package manually
               add(SmsPackage())
+              add(DirectCallPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"

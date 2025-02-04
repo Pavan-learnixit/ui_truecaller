@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NewMessage from './Bottom/NewMessage';
 import Favourates from '../screens/Favourates';
-const transperent = 'rgba(0,0,0,0.5)';
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -124,7 +124,7 @@ const AppNavigator = () => {
           component={ContactsInfo}
           options={{headerShown: true}}
         />
-           <Stack.Screen
+        <Stack.Screen
           name="Favourates"
           component={Favourates}
           options={{headerShown: true}}
@@ -139,40 +139,40 @@ const AppNavigator = () => {
             headerStyle: {backgroundColor: '#007aff'},
             headerTintColor: 'white',
             headerRight: () => (
-              <>
-             <TouchableOpacity
-      style={{ marginRight: 10 }}
-      onPress={() => setIsRed(!isRed)} // Toggle the state on press
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Icon
-         name={isRed ? 'heart' : 'heart-outline'}
-          size={24}
-          color={isRed ? 'red' : 'white'} // Change color based on state
-          style={{ marginRight: 10 }}
-        />
-      </View>
-    </TouchableOpacity>
-                <TouchableOpacity
-                  style={{marginRight: 10}}
-                  onPress={() => setOpenModel(true)}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Ionicons
-                      name="ellipsis-vertical"
-                      size={24}
-                      color="white"
-                    />
-                  </View>
-                </TouchableOpacity>
-                {renderModel()}
-              </>
+            <>
+              <TouchableOpacity
+                style={{ marginRight: 10 }}
+                onPress={() => setIsRed(!isRed)} // Toggle the state on press
+              >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon
+                name={isRed ? 'heart' : 'heart-outline'}
+                  size={24}
+                  color={isRed ? 'red' : 'white'} // Change color based on state
+                  style={{ marginRight: 10 }}
+                />
+              </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{marginRight: 10}}
+                onPress={() => setOpenModel(true)}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Ionicons
+                    name="ellipsis-vertical"
+                    size={24}
+                    color="white"
+                  />
+                </View>
+              </TouchableOpacity>
+              {renderModel()}
+            </>
             ),
           }}
         />
 
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Parent" component={Parent} options={{headerShown:false}}/>
-        <Stack.Screen name="NewMessage" component={NewMessage} options={{headerShown:true, title: 'Message'}}/>
+        <Stack.Screen name="Parent" component={Parent} options={{ headerShown:false }}/>
+        <Stack.Screen name="NewMessage" component={NewMessage} options={{ headerShown:true, title: 'Message' }}/>
     </Stack.Navigator>
   </NavigationContainer>
   )

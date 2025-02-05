@@ -11,10 +11,12 @@ const NewMessage = () => {
 
   useEffect(() => {
     // Extract SMS data from the route
+
     const { sms, smsList } = route.params || {};
     setSelectedSender(sms);
     
     setMessages(smsList[sms]);
+    // console.log("totla",messages)
   }, [route.params]);
 
 
@@ -43,6 +45,7 @@ const NewMessage = () => {
     try {
       const result = await SmsModule.sendSms('7815058420', newMessage);
       console.log(result); // SMS sent successfully
+      // console.log("here",messages);
       Alert.alert('Success', 'Message sent successfully');
     } catch (error) {
       console.error(error.message); // Handle error
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
   sender: { fontSize: 18, color: 'blue' },
   messageContainer: { marginTop: 20 },
   subtitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  messageText: { fontSize: 16, marginBottom: 5 },
+  messageText: { fontSize: 16, marginBottom: 5,backgroundColor:'#fff', padding:15 },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',

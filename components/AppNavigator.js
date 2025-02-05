@@ -1,7 +1,10 @@
-import {StyleSheet, Text, TouchableOpacity, View, Modal} from 'react-native';
-import React from 'react';
+import {StyleSheet, Text, TouchableOpacity, View,PermissionsAndroid, Modal} from 'react-native';
+// import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
+import React, { createContext } from 'react';
+import Contacts from 'react-native-contacts';
+
 import Splash from './normal/Splash';
 import Parent from './normal/Parent';
 import LanguageSelection from '../screens/Language';
@@ -9,17 +12,54 @@ import Slider from './Carousel';
 import Home from '../screens/Home';
 import ContactsInfo from './contact/Contacts';
 import CallerDetails from './CallerDetails/CallerDetails';
-
+import PermissionScreen from '../screens/PermissionScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NewMessage from './Bottom/NewMessage';
 import Favourates from '../screens/Favourates';
+import AddToFavourites from '../screens/AddToFavourites';
 const transperent = 'rgba(0,0,0,0.5)';
 const Stack = createStackNavigator();
+export const myContext = createContext();
 
 const AppNavigator = () => {
   const [openModal, setOpenModel] = React.useState(false);
   const [isRed, setIsRed] = React.useState(false);
+  const [contactDetails, setContactDetails] = React.useState([]);
+  
+  React.useEffect(() => {
+    fetchContacts();
+  }, [contactDetails]);
+
+  const fetchContacts = async () => {
+    const hasPermission = await requestContactsPermission();
+    if (hasPermission) {
+      Contacts.getAll()
+      
+        .then(fetchedContacts => setContactDetails(fetchedContacts))
+        .catch(error => console.error('Error fetching contacts:', error));
+    }
+  };
+
+  const requestContactsPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        {
+          title: 'Contacts Permission',
+          message: 'This app would like to access your contacts.',
+          buttonPositive: 'OK',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } else {
+      return true;
+    }
+  };
+
+  
+
+  
   function renderModel() {
     return (
       <Modal visible={openModal} animationType="fade" transparent={true}>
@@ -101,7 +141,9 @@ const AppNavigator = () => {
       </Modal>
     );
   }
+  
   return (
+    <myContext.Provider value={contactDetails}>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -129,7 +171,17 @@ const AppNavigator = () => {
           component={Favourates}
           options={{headerShown: true}}
         />
-        <Stack.Screen
+      <Stack.Screen
+          name="AddToFavourites"
+          component={AddToFavourites}
+          options={{headerShown: true}}
+        />
+<Stack.Screen
+          name="PermissionScreen"
+          component={PermissionScreen}
+          options={{headerShown: false}}
+        />  
+              <Stack.Screen
           name="ContactDetails"
           component={CallerDetails}
           options={{
@@ -175,6 +227,7 @@ const AppNavigator = () => {
         <Stack.Screen name="NewMessage" component={NewMessage} options={{headerShown:true, title: 'Message'}}/>
     </Stack.Navigator>
   </NavigationContainer>
+  </myContext.Provider>
   )
 }
 

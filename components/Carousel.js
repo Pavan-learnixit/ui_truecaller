@@ -15,6 +15,8 @@ import { languages } from '../assets/data/Data';
 import MatIcon from 'react-native-vector-icons/MaterialIcons';
 import { translation } from '../assets/data/utils';
 import RingingCard from './RingingCard';
+import PermissionScreen from '../screens/PermissionScreen';
+
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -90,26 +92,26 @@ function Slider({ navigation, route }) {
         },
     ];
 
-    const requestPermissions = async () => {
-    if (Platform.OS === 'android') {
-        try {
-        // Request permissions for contacts
-        const callLogPermission = await request(PERMISSIONS.ANDROID.READ_CALL_LOG);
-        const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
-        console.log('Contacts permission:', contactsPermission);
+    // const requestPermissions = async () => {
+    // if (Platform.OS === 'android') {
+    //     try {
+    //     // Request permissions for contacts
+    //     const callLogPermission = await request(PERMISSIONS.ANDROID.READ_CALL_LOG);
+    //     const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
+    //     console.log('Contacts permission:', contactsPermission);
         
-        if (
-            callLogPermission === RESULTS.GRANTED && contactsPermission === RESULTS.GRANTED 
-        ) {
-            console.log('Permissions granted for contacts and call logs');
-        } else {
-            console.log('Permissions denied');
-        }
-        } catch (error) {
-        console.error('Error requesting permissions', error);
-        }
-    }
-    };
+    //     if (
+    //         callLogPermission === RESULTS.GRANTED && contactsPermission === RESULTS.GRANTED 
+    //     ) {
+    //         console.log('Permissions granted for contacts and call logs');
+    //     } else {
+    //         console.log('Permissions denied');
+    //     }
+    //     } catch (error) {
+    //     console.error('Error requesting permissions', error);
+    //     }
+    // }
+    // };
 
     const saveSelectedLang =  async(selectedLanguage)=>{
         await AsyncStorage.setItem('LANG', selectedLanguage);
@@ -145,8 +147,8 @@ function Slider({ navigation, route }) {
                     // rippleColor={'#f8f8f8'}
                     style={{backgroundColor: 'green', padding: 10, borderRadius: 10, width: width/1.5, alignItems: 'center'}}
                     onPress={() => {
-                        requestPermissions();
-                        navigation.navigate('Parent')
+                        // requestPermissions();
+                        navigation.navigate('PermissionScreen')
                     }}
                 />
                 <Text style={styles.privacyText}>

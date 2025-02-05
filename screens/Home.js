@@ -12,7 +12,6 @@ import {
   Modal
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
 import CallLogs from 'react-native-call-log';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {useSharedValue, useDerivedValue} from 'react-native-reanimated';
@@ -44,7 +43,6 @@ const Home = ({navigation}) => {
 
         try {
           const logs = await CallLogs.loadAll();
-          // console.log('logs', logs);
 
           setCallLogs(logs);
           sharedCallLogs.value = logs; // Update shared value

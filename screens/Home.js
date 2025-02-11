@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,8 @@ import {
   StyleSheet,
   PermissionsAndroid,
   Platform,
-  Modal
+  Modal,
+  ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CallLogs from 'react-native-call-log';
@@ -19,49 +20,68 @@ import Favourates from './Favourates';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Home = ({navigation}) => {
-  const [callLogs, setCallLogs] = React.useState([]);
- const [openModal, setOpenModel] = React.useState(false);
-  // Shared value to handle call logs safely
+  const [callLogs, setCallLogs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true); // Set initial loading state to true
+  const [data, setData] = useState([]);
+  const [filteredLogs, setFilteredLogs] = useState([]);
+  const [openModel, setOpenModel] = useState(false);
+  const [filterType, setFilterType] = useState(null); // 'OUTGOING', 'INCOMING', 'MISSED', 'BLOCKED'
   const sharedCallLogs = useSharedValue([]);
 
-  React.useEffect(() => {
-    const fetchCallLogs = async () => {
+  useEffect(() => {
+    const requestPermissions = async () => {
       if (Platform.OS === 'android') {
-        const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
         );
-
-        if (!hasPermission) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
-          );
-          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('Call log permission denied');
-            return;
-          }
-        }
-
-        try {
-          const logs = await CallLogs.loadAll();
-
-          setCallLogs(logs);
-          sharedCallLogs.value = logs; // Update shared value
-        } catch (error) {
-          console.error('Error fetching call logs:', error);
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          fetchCallLogs();
         }
       } else {
-        console.log('Call logs are not supported on iOS');
+        fetchCallLogs();
       }
     };
 
-    fetchCallLogs();
-  }, []);
+    const fetchCallLogs = async () => {
+      try {
+        const logs = await CallLogs.loadAll();
+        setCallLogs(logs);
+        setIsLoading(false); // Set loading to false once data is fetched
+      } catch (error) {
+        console.error('Error fetching call logs:', error);
+        setIsLoading(false); // Set loading to false in case of error
+      }
+    };
 
-  // Use derived value to read from shared value
-  const derivedCallLogs = useDerivedValue(
-    () => sharedCallLogs.value,
-    [sharedCallLogs],
-  );
+    requestPermissions();
+  }, []);
+  
+
+  // Function to filter logs based on search input
+  useEffect(() => {
+    let filtered = filteredLogs.length ? filteredLogs : callLogs;
+    setData(callLogs);
+
+    if (searchQuery.trim()) {
+      filtered = filtered.filter((log) =>
+        log.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        log.phoneNumber.includes(searchQuery)
+      );
+    }
+  
+    if (filterType) {
+      filtered = filtered.filter((log) => {
+        return (
+          (filterType === 'OUTGOING' && log.type.includes('OUT')) ||
+          (filterType === 'INCOMING' && log.type.includes('IN')) ||
+          (filterType === 'MISSED' && log.type.includes('MISSED')) ||
+          (filterType === 'BLOCKED' && log.type.includes('BLOCKED'))
+        );
+      });
+    }
+    setFilteredLogs(filtered);
+  }, [searchQuery, filterType, callLogs]);
 
   const renderContactItem = ({item}) => (
     <View style={styles.contactItem}>
@@ -87,24 +107,23 @@ const Home = ({navigation}) => {
       <Text style={styles.contactTime}>{item.duration} sec</Text>
     </View>
   );
- function renderModel() {
+
+  function renderModel() {
     return (
-      <Modal visible={openModal} animationType="fade" transparent={true}>
+      <Modal visible={openModel} animationType="fade" transparent={true}>
         <View
           style={{
             flex: 1,
             justifyContent: 'flex-start',
             alignItems: 'flex-end',
-            // backgroundColor: transperent,
           }}>
-          <View
-            style={{backgroundColor: 'white', padding: 15, borderRadius: 10}}>
+          <View style={{backgroundColor: 'white', padding: 15, borderRadius: 10}}>
             <TouchableOpacity
               style={{alignItems: 'flex-end'}}
               onPress={() => setOpenModel(false)}>
               <Ionicons name="close" size={24} color="black" />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setFilterType('OUTGOING')}>
               <View style={{flexDirection: 'row'}}>
                 <Ionicons name="arrow-up-outline" size={24} color="green" />
                 <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
@@ -112,16 +131,15 @@ const Home = ({navigation}) => {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setFilterType('INCOMING')}>
               <View style={{flexDirection: 'row'}}>
                 <Ionicons name="arrow-down-outline" size={24} color="red" />
-
                 <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
                   Incoming calls
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setFilterType('MISSED')}>
               <View style={{flexDirection: 'row'}}>
                 <Ionicons name="call-outline" size={20} color="red" />
                 <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
@@ -129,7 +147,7 @@ const Home = ({navigation}) => {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setFilterType('BLOCKED')}>
               <View style={{flexDirection: 'row'}}>
                 <Ionicons name="ban-outline" size={20} color="red" />
                 <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
@@ -140,44 +158,43 @@ const Home = ({navigation}) => {
             <TouchableOpacity>
               <View style={{flexDirection: 'row'}}>
                 <Ionicons name="trash-outline" size={20} color="red" />
-
                 <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
                   Delete all calls
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity>
-            <View style={{flexDirection: 'row'}}>
-            <Ionicons name="call-outline" size={20} color="black" />
-            <Text style={{fontSize: 18, marginBottom: 5,marginLeft: 8}}>Set default sim</Text>
-            </View>
-              
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="call-outline" size={20} color="black" />
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>Set default sim</Text>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity>
-            <View style={{flexDirection: 'row'}}>
-            <Ionicons name="clipboard-outline" size={20} color="black" />
-
-            <Text style={{fontSize: 18, marginBottom: 5,marginLeft: 8}}>
-                Paste
-              </Text>
-            </View>
-             
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="clipboard-outline" size={20} color="black" />
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                  Paste
+                </Text>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity>
-            <View style={{flexDirection: 'row'}}>
-            <Ionicons name="settings-outline" size={20} color="black" />
-
-            <Text style={{fontSize: 18, marginBottom: 5,marginLeft: 8}}>
-                Settings
-              </Text>
-            </View>  
-             
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons name="settings-outline" size={20} color="black" />
+                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                  Settings
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
     );
   }
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  }
+
   return (
     <View style={styles.container}>
       {/* Search Bar */}
@@ -186,23 +203,25 @@ const Home = ({navigation}) => {
           style={styles.searchInput}
           placeholder="Search numbers, names & more"
           placeholderTextColor="#aaa"
+          autoCapitalize='none'
+          autoCorrect={false}
+          value={searchQuery}
+          onChangeText={(query) => handleSearch(query)}
         />
-       
-<TouchableOpacity style={{   
-  // flex: 1,
-  position:'absolute',
-    flexDirection: 'row', // Arrange items in a row
-    justifyContent: 'flex-end', // Push to the right
-    alignItems: 'center', // Center vertically
-    padding: 10,
-    top:9,
-    right:10
-     }}
-     onPress={() => setOpenModel(true)}>
-<Ionicons  name="ellipsis-vertical" size={24} color="#000" />
-
-</TouchableOpacity>
-{renderModel()}
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            padding: 10,
+            top: 9,
+            right: 10
+          }}
+          onPress={() => setOpenModel(true)}>
+          <Ionicons name="ellipsis-vertical" size={24} color="#000" />
+        </TouchableOpacity>
+        {renderModel()}
       </View>
 
       {/* Top Navigation Buttons */}
@@ -238,10 +257,19 @@ const Home = ({navigation}) => {
 
       {/* Contact List */}
       <FlatList
-        data={callLogs} // Use derived value for rendering
-        keyExtractor={(item, index) => index.toString()}
+        data={filteredLogs.length ? filteredLogs : callLogs}
+        keyExtractor={(item, index) =>
+          item?.id?.toString() || `${item.phoneNumber}-${index}`
+        }
         renderItem={renderContactItem}
         contentContainerStyle={styles.contactList}
+        ListEmptyComponent={
+          isLoading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color="#5500dc" />
+            </View>
+          ) : null
+        }
       />
     </View>
   );
@@ -345,6 +373,11 @@ const styles = StyleSheet.create({
   contactTime: {
     fontSize: 14,
     color: '#999',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

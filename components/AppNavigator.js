@@ -22,7 +22,7 @@ const transperent = 'rgba(0,0,0,0.5)';
 const Stack = createStackNavigator();
 export const myContext = createContext();
 
-const AppNavigator = () => {
+const AppNavigator = ({ navigation }) => {
   const [openModal, setOpenModel] = React.useState(false);
   const [isRed, setIsRed] = React.useState(false);
   const [contactDetails, setContactDetails] = React.useState([]);
@@ -169,7 +169,16 @@ const AppNavigator = () => {
            <Stack.Screen
           name="Favourates"
           component={Favourates}
-          options={{headerShown: true}}
+          options={({ navigation }) => ({
+            headerShown: true,
+            headerBackVisible: true, // Ensures back button is visible
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                <Text style={{ marginLeft: 15, fontSize: 18, color: 'blue', marginRight:15 }}>←</Text>
+              </TouchableOpacity>
+            ),
+            headerBackTitleVisible: false, // Optional: hides "Back" text
+          })}
         />
       <Stack.Screen
           name="AddToFavourites"

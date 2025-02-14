@@ -18,6 +18,8 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import {useSharedValue, useDerivedValue} from 'react-native-reanimated';
 import Favourates from './Favourates';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Splash from '../components/normal/Splash';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({navigation}) => {
   const [callLogs, setCallLogs] = useState([]);
@@ -109,6 +111,10 @@ const Home = ({navigation}) => {
   );
 
   function renderModel() {
+    const handleLogout =  () => {
+      AsyncStorage.setItem('success', 'false'); // Set success to false
+     navigation.navigate('Splash'); 
+   };
     return (
       <Modal visible={openModel} animationType="fade" transparent={true}>
         <View
@@ -177,14 +183,14 @@ const Home = ({navigation}) => {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={{flexDirection: 'row'}}>
-                <Ionicons name="settings-outline" size={20} color="black" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
-                  Settings
-                </Text>
-              </View>
-            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleLogout()}>
+  <View style={{ flexDirection: 'row' }}>
+    <Ionicons name="settings-outline" size={20} color="black" />
+    <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
+      Logout
+    </Text>
+  </View>
+</TouchableOpacity>
           </View>
         </View>
       </Modal>

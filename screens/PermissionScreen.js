@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import SignupScreen from './SignupScreen';
+
 
 const PermissionScreen = ({ navigation }) => {
   const [permissionsGranted, setPermissionsGranted] = useState(false);
@@ -75,7 +77,7 @@ const PermissionScreen = ({ navigation }) => {
         style={[styles.button, { backgroundColor: permissionsGranted ? '#007AFF' : 'gray' }]}
         onPress={() => {
           if (permissionsGranted) {
-            navigation.navigate('Parent');
+            navigation.navigate('SignupScreen');
           } else {
             Alert.alert('Permissions Required', 'Please grant the required permissions before continuing.');
           }

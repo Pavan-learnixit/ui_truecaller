@@ -1,44 +1,53 @@
-import { View, Animated } from 'react-native'
-import React, { useEffect, useRef } from 'react'
+import { View, Animated } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Splash = ({navigation}) => {
-    useEffect(()=>{
-        setTimeout(()=>{
-            navigation.navigate('Language')
-        },4000)
-    },[])
+const Splash = ({ navigation }) => {
+    const scaleValue = useRef(new Animated.Value(1)).current;
+    const opacityValue = useRef(new Animated.Value(1)).current;
 
-    const scaleValue = useRef(new Animated.Value(1)).current; // Initial scale
-    const opacityValue = useRef(new Animated.Value(1)).current; // Initial opacity
+    useEffect(() => {
+        checkLoginStatus(); // Check AsyncStorage for login success
+    }, []);
+
+    const checkLoginStatus = async () => {
+        const success = await AsyncStorage.getItem('success');
+
+        setTimeout(() => {
+            if (success === 'true') {
+                navigation.replace('Parent'); // Navigate to Parent if OTP was verified
+            } else {
+                navigation.replace('Language'); // Otherwise, go to Language selection
+            }
+        }, 4000);
+    };
 
     useEffect(() => {
         const startAnimation = () => {
-            // Subtle pulsating effect
             Animated.sequence([
                 Animated.loop(
                     Animated.sequence([
                         Animated.timing(scaleValue, {
-                            toValue: 1.2, // Slightly increase size
+                            toValue: 1.2,
                             duration: 500,
                             useNativeDriver: true,
                         }),
                         Animated.timing(scaleValue, {
-                            toValue: 1, // Return to original size
+                            toValue: 1,
                             duration: 500,
                             useNativeDriver: true,
                         }),
                     ]),
-                    { iterations: 3 } // Run pulsation 3 times
+                    { iterations: 3 }
                 ),
-                // Fill screen at the end
                 Animated.parallel([
                     Animated.timing(scaleValue, {
-                        toValue: 10, // Scale large enough to fill screen
+                        toValue: 10,
                         duration: 1000,
                         useNativeDriver: true,
                     }),
                     Animated.timing(opacityValue, {
-                        toValue: 0, // Fade out for a smooth effect
+                        toValue: 0,
                         duration: 1000,
                         useNativeDriver: true,
                     }),
@@ -49,19 +58,14 @@ const Splash = ({navigation}) => {
         startAnimation();
     }, [scaleValue, opacityValue]);
 
-    const animatedStyle = {
-        transform: [{ scale: scaleValue }], // Scale the image
-        opacity: opacityValue, // Adjust opacity
-    };
-
-  return (
-    <View style={{ flex:1, justifyContent:"center", alignItems:'center' }}>
-      <Animated.Image
+    return (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: 'center' }}>
+            <Animated.Image
                 source={require('../../assets/images/logo.png')}
-                style={[ animatedStyle]}
+                style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}
             />
-    </View>
-  )
-}
+        </View>
+    );
+};
 
-export default Splash
+export default Splash;

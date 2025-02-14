@@ -18,6 +18,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import NewMessage from './Bottom/NewMessage';
 import Favourates from '../screens/Favourates';
 import AddToFavourites from '../screens/AddToFavourites';
+import SignupScreen from '../screens/SignupScreen';
+import OtpScreen from '../screens/OtpScreen';
+import LoginScreen from '../screens/LoginScreen';
+
 const transperent = 'rgba(0,0,0,0.5)';
 const Stack = createStackNavigator();
 export const myContext = createContext();
@@ -166,6 +170,14 @@ const AppNavigator = ({ navigation }) => {
           component={ContactsInfo}
           options={{headerShown: true}}
         />
+          <Stack.Screen
+          name="SignupScreen"
+          component={SignupScreen}
+          options={{headerShown: false}}
+        />
+         <Stack.Screen name="OtpScreen" component={OtpScreen} options={{headerShown: false}} />
+         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{headerShown: false}} />
+
            <Stack.Screen
           name="Favourates"
           component={Favourates}

@@ -1,11 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { TouchableOpacity, StyleSheet, Text, TextInput, View } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, TextInput, View, ToastAndroid, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Parent from '../components/normal/Parent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Logo from '../assets/images/LearnixIT.png';
 
 const OtpScreen = ({ navigation }) => {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const inputs = useRef([]);
 
   const handleChange = (text, index) => {
@@ -14,12 +14,8 @@ const OtpScreen = ({ navigation }) => {
     newOtp[index] = text;
     setOtp(newOtp);
 
-    if (text && index < 5) {
+    if (text && index < 3) {
       inputs.current[index + 1].focus();
-    }
-
-    if (index === 5 && text !== '') {
-      handleContinue();
     }
   };
 
@@ -29,24 +25,26 @@ const OtpScreen = ({ navigation }) => {
     }
   };
 
-  const handleContinue = async() => {
+  const handleContinue = async () => {
     const enteredOtp = otp.join('');
-  
-    if (enteredOtp === '123456') {
-        await AsyncStorage.setItem('success', 'true'); // Store success in AsyncStorage
-      alert('OTP Verified! Proceeding...');
-      navigation.navigate('Parent')
-    } else {
-      alert('Invalid OTP. Please try again.');
+
+    if (enteredOtp !== '1234') {
+      ToastAndroid.show('Invalid OTP!', ToastAndroid.LONG);
+      return;
     }
+    await AsyncStorage.setItem('success', 'true'); // Store success in AsyncStorage
+    ToastAndroid.show('OTP Verified!', ToastAndroid.LONG);
+    navigation.navigate('Parent')
   };
-  
+
 
   return (
-    <LinearGradient colors={['#6a11cb', '#2575fc']} style={styles.container}>
-      <Text style={styles.title}>Enter OTP</Text>
-      <Text style={styles.subtitle}>We've sent a verification code to your phone</Text>
-
+    <LinearGradient colors={['#1E98CA', '#000']} style={styles.container}>
+      <View style={{ alignItems: 'center', justifyContent: 'space-evenly', flexBasis: '30%' }}>
+        <Text style={styles.title}>Enter OTP</Text>
+        <Image source={Logo} style={{ width: 80, height: 80, borderRadius: 60 }} />
+        <Text style={styles.subtitle}>We've sent a verification code to your phone</Text>
+      </View>
       <View style={styles.otpContainer}>
         {otp.map((digit, index) => (
           <TextInput
@@ -78,7 +76,7 @@ export default OtpScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
@@ -86,12 +84,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
     color: '#fff',
-    marginBottom: 20,
+    // marginBottom: 20,
     textAlign: 'center',
   },
   otpContainer: {
@@ -116,7 +114,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
   },
   button: {
-    backgroundColor: '#ff8c00',
+    backgroundColor: '#1E98CA',
     paddingVertical: 12,
     paddingHorizontal: 50,
     borderRadius: 25,

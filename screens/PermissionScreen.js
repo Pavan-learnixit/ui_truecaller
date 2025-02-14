@@ -77,7 +77,7 @@ const PermissionScreen = ({ navigation }) => {
         style={[styles.button, { backgroundColor: permissionsGranted ? '#007AFF' : 'gray' }]}
         onPress={() => {
           if (permissionsGranted) {
-            navigation.navigate('SignupScreen');
+            navigation.navigate('Signup');
           } else {
             Alert.alert('Permissions Required', 'Please grant the required permissions before continuing.');
           }

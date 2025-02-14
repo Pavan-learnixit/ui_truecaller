@@ -1,10 +1,12 @@
 import { StyleSheet } from 'react-native';
+import { commonColors } from '../../components/Common';
 
 const commonStyles = StyleSheet.create({
     container: {
         flex: 1, // Full screen height
         backgroundColor: '#f8f8f8',
-        margin:10
+        justifyContent: 'space-around',
+        // margin:10
       },
       topContainer: {
         height: 60, // Fixed height for the top container
@@ -13,9 +15,9 @@ const commonStyles = StyleSheet.create({
         alignItems: 'center',
       },
       middleContainer: {
-        flexGrow: 1, // Dynamically fill available space
+        flexBasis: '60%', // Dynamically fill available space
         padding: 20,
-        flex:2,
+        // flex:2,
         // backgroundColor: '#2196f3',
         alignItems: 'center',
         flexDirection : 'row',
@@ -31,7 +33,7 @@ const commonStyles = StyleSheet.create({
       title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#007AFF',
+        color: commonColors.black,
         marginVertical: 10,
         textAlign: "center"
       },

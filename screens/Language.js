@@ -3,12 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import commonStyles from '../assets/css/Style';
 import { languages } from '../assets/data/Data';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
+import { commonColors } from '../components/Common';
 
 const LanguageSelection = ({ navigation }) => {
-
   return (
-    <View style={commonStyles.container}>
-      <View style={commonStyles.topContainer}>
+    <LinearGradient colors={[commonColors.gradiend1, commonColors.white]} style={commonStyles.container}>
+      <View style={{ alignItems: 'center' }}>
         <Text style={commonStyles.title}>Welcome to Lifeline</Text>
         <Text style={commonStyles.subtitle}>Pick your language to get started</Text>
       </View>
@@ -27,7 +28,7 @@ const LanguageSelection = ({ navigation }) => {
       <View style={commonStyles.bottomContainer}>
         <Text style={styles.footerText}>Choose another language</Text>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 

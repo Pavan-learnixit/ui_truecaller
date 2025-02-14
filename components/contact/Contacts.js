@@ -2,9 +2,10 @@ import {
   View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, PermissionsAndroid, Platform 
 } from 'react-native';
 import Contacts from 'react-native-contacts';
-import { RenderItem } from '../Common';
+import { commonColors, RenderItem } from '../Common';
 import React, { useContext, useState, useEffect } from 'react';
 import { myContext } from '../AppNavigator';
+import LinearGradient from 'react-native-linear-gradient';
 
 const ContactsInfo = ({ navigation }) => {
   const contactDetails = useContext(myContext); // Getting contacts from context
@@ -28,7 +29,7 @@ const ContactsInfo = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={[commonColors.gradiend1, commonColors.light]} style={styles.container}>
       {/* Search Bar */}
       <View style={styles.searchBar}>
         <TextInput
@@ -59,7 +60,7 @@ const ContactsInfo = ({ navigation }) => {
         )}
         contentContainerStyle={styles.contactList}
       />
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   searchBar: {
-    backgroundColor: '#f1f1f1',
+    // backgroundColor: '#f1f1f1',
     padding: 10,
   },
   searchInput: {

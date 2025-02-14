@@ -59,11 +59,12 @@ const Splash = ({ navigation }) => {
     }, [scaleValue, opacityValue]);
 
     return (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: 'center' }}>
+        <View style={{ flex: 1, justifyContent: "space-around", alignItems: 'center' }}>
             <Animated.Image
-                source={require('../../assets/images/logo.png')}
-                style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}
+                source={require('../../assets/images/LearnixIT.png')}
+                style={{ transform: [{ scale: scaleValue }], opacity: opacityValue, width: 100, height: 100 }}
             />
+            <Animated.Text style={{ transform: [{ scale: scaleValue }], opacity: opacityValue, fontSize: 20, fontWeight: 'bold', color: '#000' }}>Lifeline</Animated.Text>
         </View>
     );
 };

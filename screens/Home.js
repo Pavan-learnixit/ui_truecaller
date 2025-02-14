@@ -21,10 +21,12 @@ import Favourates from './Favourates';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Splash from '../components/normal/Splash';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
+import { commonColors } from '../components/Common';
 
 const { DirectCall } = NativeModules;
 
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
   const [callLogs, setCallLogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true); // Set initial loading state to true
@@ -61,7 +63,7 @@ const Home = ({navigation}) => {
 
     requestPermissions();
   }, []);
-  
+
 
   // Function to filter logs based on search input
   useEffect(() => {
@@ -74,7 +76,7 @@ const Home = ({navigation}) => {
         log.phoneNumber.includes(searchQuery)
       );
     }
-  
+
     if (filterType) {
       filtered = filtered.filter((log) => {
         return (
@@ -110,13 +112,13 @@ const Home = ({navigation}) => {
   const handleCall = async (phoneNumber) => {
     const hasPermission = await requestCallPermission();
     console.log('hasPermission', hasPermission);
-    
+
     if (!hasPermission) {
       await requestCallPermission();
       Alert.alert('Permission Denied', 'Cannot make a call without permission.');
       return;
     }
-  
+
     try {
       DirectCall.callNumber(phoneNumber); // Initiates the call directly
     } catch (error) {
@@ -125,10 +127,10 @@ const Home = ({navigation}) => {
     }
   };
 
-  const renderContactItem = ({item}) => (
+  const renderContactItem = ({ item }) => (
     <View style={styles.contactItem}>
       {item.image ? (
-        <Image source={{uri: item.image}} style={styles.contactImage} />
+        <Image source={{ uri: item.image }} style={styles.contactImage} />
       ) : (
         <View style={styles.contactInitial}>
           <Text style={styles.contactInitialText}>{item.name?.[0] || 'U'}</Text>
@@ -153,10 +155,10 @@ const Home = ({navigation}) => {
   );
 
   function renderModel() {
-    const handleLogout =  () => {
+    const handleLogout = () => {
       AsyncStorage.setItem('success', 'false'); // Set success to false
-     navigation.navigate('Splash'); 
-   };
+      navigation.navigate('Login'); // Navigate to login screen
+    };
     return (
       <Modal visible={openModel} animationType="fade" transparent={true}>
         <View
@@ -165,74 +167,74 @@ const Home = ({navigation}) => {
             justifyContent: 'flex-start',
             alignItems: 'flex-end',
           }}>
-          <View style={{backgroundColor: 'white', padding: 15, borderRadius: 10}}>
+          <View style={{ backgroundColor: 'white', padding: 15, borderRadius: 10 }}>
             <TouchableOpacity
-              style={{alignItems: 'flex-end'}}
+              style={{ alignItems: 'flex-end' }}
               onPress={() => setOpenModel(false)}>
               <Ionicons name="close" size={24} color="black" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setFilterType('OUTGOING')}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="arrow-up-outline" size={24} color="green" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
                   Outgoing calls
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setFilterType('INCOMING')}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="arrow-down-outline" size={24} color="red" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
                   Incoming calls
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setFilterType('MISSED')}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="call-outline" size={20} color="red" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
                   Missed calls
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setFilterType('BLOCKED')}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="ban-outline" size={20} color="red" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
                   Blocked calls
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="trash-outline" size={20} color="red" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
                   Delete all calls
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="call-outline" size={20} color="black" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>Set default sim</Text>
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>Set default sim</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="clipboard-outline" size={20} color="black" />
-                <Text style={{fontSize: 18, marginBottom: 5, marginLeft: 8}}>
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
                   Paste
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleLogout()}>
-  <View style={{ flexDirection: 'row' }}>
-    <Ionicons name="settings-outline" size={20} color="black" />
-    <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
-      Logout
-    </Text>
-  </View>
-</TouchableOpacity>
+              <View style={{ flexDirection: 'row' }}>
+                <Ionicons name="settings-outline" size={20} color="black" />
+                <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
+                  Logout
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -244,7 +246,7 @@ const Home = ({navigation}) => {
   }
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={[commonColors.gradiend1, commonColors.light]} style={styles.container}>
       {/* Search Bar */}
       <View style={styles.searchBar}>
         <TextInput
@@ -319,7 +321,7 @@ const Home = ({navigation}) => {
           ) : null
         }
       />
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -329,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   searchBar: {
-    backgroundColor: '#f1f1f1',
+    // backgroundColor: '#f1f1f1',
     padding: 10,
   },
   searchInput: {
@@ -343,7 +345,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 10,
-    backgroundColor: '#f9f9f9',
+    // backgroundColor: '#f9f9f9',
     borderRadius: 10,
   },
   topButton: {
@@ -421,6 +423,7 @@ const styles = StyleSheet.create({
   contactTime: {
     fontSize: 14,
     color: '#999',
+    paddingRight: 20
   },
   loaderContainer: {
     flex: 1,

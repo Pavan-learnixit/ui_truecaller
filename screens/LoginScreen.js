@@ -1,40 +1,25 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import Logo from '../assets/images/LearnixIT.png';
 
 const LoginScreen = ({ navigation }) => {
-//   const [firstName, setFirstName] = useState('');
-//   const [lastName, setLastName] = useState('');
   const [mobile, setMobile] = useState('');
 
   const handleLogin = () => {
     if (mobile.length === 10) {
-      navigation.navigate('OtpScreen');
+      navigation.navigate('VerifyOtp');
     } else {
       alert('Please enter a valid mobile number');
     }
   };
 
   return (
-    <LinearGradient colors={['#ff7eb3', '#ff758c']} style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-
-      {/* <TextInput
-        placeholder="First Name"
-        placeholderTextColor="#fff"
-        style={styles.input}
-        value={firstName}
-        onChangeText={setFirstName}
-      /> */}
-
-      {/* <TextInput
-        placeholder="Last Name"
-        placeholderTextColor="#fff"
-        style={styles.input}
-        value={lastName}
-        onChangeText={setLastName}
-      /> */}
-
+    <LinearGradient colors={['#1E98CA', '#63BC46']} style={styles.container}>
+      <View style={{ alignItems: 'center' }}>
+        <Text style={styles.title}>Welcome Back</Text>
+        <Image source={Logo} style={{ width: 80, height: 80, borderRadius: 60 }} />
+      </View>
       <TextInput
         placeholder="Mobile Number"
         placeholderTextColor="#fff"
@@ -51,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
 
       <View style={styles.signupContainer}>
         <Text style={styles.normalText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('SignupScreen')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.signupText}>Sign up</Text>
         </TouchableOpacity>
       </View>
@@ -64,7 +49,7 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
@@ -87,7 +72,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   button: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1E98CA',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 10,
@@ -101,7 +86,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#ff758c',
+    color: '#fff',
   },
   signupContainer: {
     flexDirection: 'row',

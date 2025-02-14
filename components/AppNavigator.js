@@ -183,13 +183,13 @@ const AppNavigator = ({ navigation }) => {
           component={Favourates}
           options={({ navigation }) => ({
             headerShown: true,
-            headerBackVisible: true, // Ensures back button is visible
-            headerLeft: () => (
-              <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                <Text style={{ marginLeft: 15, fontSize: 18, color: 'blue', marginRight:15 }}>←</Text>
-              </TouchableOpacity>
-            ),
-            headerBackTitleVisible: false, // Optional: hides "Back" text
+            // headerBackVisible: true, // Ensures back button is visible
+            // headerLeft: () => (
+            //   <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            //     <Text style={{ marginLeft: 15, fontSize: 18, color: 'blue', marginRight:15 }}>←</Text>
+            //   </TouchableOpacity>
+            // ),
+            // headerBackTitleVisible: false, // Optional: hides "Back" text
           })}
         />
       <Stack.Screen

@@ -10,16 +10,19 @@ import {
   PermissionsAndroid,
   Platform,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
+  NativeModules
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CallLogs from 'react-native-call-log';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import {useSharedValue, useDerivedValue} from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import Favourates from './Favourates';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Splash from '../components/normal/Splash';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { DirectCall } = NativeModules;
 
 const Home = ({navigation}) => {
   const [callLogs, setCallLogs] = useState([]);
@@ -85,6 +88,43 @@ const Home = ({navigation}) => {
     setFilteredLogs(filtered);
   }, [searchQuery, filterType, callLogs]);
 
+  const requestCallPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+        {
+          title: 'Call Permission',
+          message: 'This app needs access to your phone to make calls.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
+  const handleCall = async (phoneNumber) => {
+    const hasPermission = await requestCallPermission();
+    console.log('hasPermission', hasPermission);
+    
+    if (!hasPermission) {
+      await requestCallPermission();
+      Alert.alert('Permission Denied', 'Cannot make a call without permission.');
+      return;
+    }
+  
+    try {
+      DirectCall.callNumber(phoneNumber); // Initiates the call directly
+    } catch (error) {
+      console.error('Error making a call:', error);
+      Alert.alert('Error', 'Unable to make a direct call.');
+    }
+  };
+
   const renderContactItem = ({item}) => (
     <View style={styles.contactItem}>
       {item.image ? (
@@ -106,7 +146,9 @@ const Home = ({navigation}) => {
           {item.type}
         </Text>
       </View>
-      <Text style={styles.contactTime}>{item.duration} sec</Text>
+      <TouchableOpacity style={styles.contactTime} onPress={() => handleCall(item.phoneNumber)}>
+        <Icon name="call" size={20} color="#000" />
+      </TouchableOpacity>
     </View>
   );
 

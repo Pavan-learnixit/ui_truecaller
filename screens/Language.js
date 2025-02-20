@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, NativeModules } from 'react-native';
 import commonStyles from '../assets/css/Style';
 import { languages } from '../assets/data/Data';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,6 +7,21 @@ import LinearGradient from 'react-native-linear-gradient';
 import { commonColors } from '../components/Common';
 
 const LanguageSelection = ({ navigation }) => {
+
+  useEffect(() => {
+    const { CallDetectionModule } = NativeModules;
+
+    // Request overlay permission and log the result.
+    CallDetectionModule.requestOverlayPermission()
+      .then(result => console.log("Overlay Permission:", result))
+      .catch(err => console.error("Error in requestOverlayPermission:", err));
+
+    // Start call detection and log the result.
+    CallDetectionModule.startCallDetection()
+      .then(result => console.log("Call Detection:", result))
+      .catch(err => console.error("Error in startCallDetection:", err));
+  }, []);
+
   return (
     <LinearGradient colors={[commonColors.gradiend1, commonColors.white]} style={commonStyles.container}>
       <View style={{ alignItems: 'center' }}>

@@ -13,8 +13,12 @@ const PermissionScreen = ({ navigation }) => {
       try {
         const callLogPermission = await request(PERMISSIONS.ANDROID.READ_CALL_LOG);
         const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
+        const readPhoneState = await request(PERMISSIONS.ANDROID.READ_PHONE_STATE);
+        // const foregroundService = await request(PERMISSIONS.ANDROID.BACKGROUND_PROCESSING);
+        // const outgoingCall = await request(PERMISSIONS.ANDROID.PROCESS_OUTGOING_CALLS);
 
-        if (callLogPermission === RESULTS.GRANTED && contactsPermission === RESULTS.GRANTED) {
+        if (callLogPermission === RESULTS.GRANTED && contactsPermission === RESULTS.GRANTED && readPhoneState === RESULTS.GRANTED) {
+          console.log('Permissions granted', callLogPermission, contactsPermission, readPhoneState);
           setPermissionsGranted(true);
         } else {
           Alert.alert('Permissions Required', 'Please grant the required permissions to continue.');

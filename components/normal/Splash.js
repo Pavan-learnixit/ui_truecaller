@@ -19,7 +19,7 @@ const Splash = ({ navigation }) => {
             } else {
                 navigation.replace('Language'); // Otherwise, go to Language selection
             }
-        }, 4000);
+        }, 100);
     };
 
     useEffect(() => {

@@ -1,20 +1,32 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import Logo from '../assets/images/LearnixIT.png';
 
 const SignupScreen = ({ navigation }) => {
-  //   const [mobile, setMobile] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [mobile, setMobile] = useState('');
 
-  const handleSignup = () => {
+  // Function to store user data in AsyncStorage
+  const storeUserData = async () => {
+    try {
+      const userData = { firstName, lastName, mobile };
+      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      console.log('User data saved:', userData);
+    } catch (error) {
+      console.error('Error saving user data:', error);
+    }
+  };
+
+  // Handle sign up and save data
+  const handleSignup = async () => {
     if (firstName && lastName && mobile.length === 10) {
-      //   alert('Login Successful!');
-      navigation.navigate('VerifyOtp')
+      await storeUserData(); // Store user data in AsyncStorage
+      navigation.navigate('VerifyOtp');
     } else {
-      alert('Please enter all details correctly.');
+      Alert.alert('Error', 'Please enter all details correctly.');
     }
   };
 
@@ -65,6 +77,7 @@ const SignupScreen = ({ navigation }) => {
 
 export default SignupScreen;
 
+// Styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     flex: 1,

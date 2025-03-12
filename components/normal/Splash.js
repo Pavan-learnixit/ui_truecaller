@@ -64,7 +64,7 @@ const Splash = ({ navigation }) => {
                 source={require('../../assets/images/LearnixIT.png')}
                 style={{ transform: [{ scale: scaleValue }], opacity: opacityValue, width: 100, height: 100 }}
             />
-            <Animated.Text style={{ transform: [{ scale: scaleValue }], opacity: opacityValue, fontSize: 20, fontWeight: 'bold', color: '#000' }}>Lifeline</Animated.Text>
+            <Animated.Text style={{ transform: [{ scale: scaleValue }], opacity: opacityValue, fontSize: 20, fontWeight: 'bold', color: '#000' }}>SafeDail</Animated.Text>
         </View>
     );
 };

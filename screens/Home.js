@@ -11,13 +11,15 @@ import {
   Platform,
   Modal,
   ActivityIndicator,
-  NativeModules
+  NativeModules,
+  TouchableWithoutFeedback
 } from 'react-native';
 import CallLogs from 'react-native-call-log';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { commonColors } from '../components/Common';
+import ProfileScreen from './ProfileScreen';
 
 const { DirectCall } = NativeModules;
 
@@ -135,12 +137,31 @@ const Home = ({ navigation }) => {
     </View>
   );
   function renderModel() {
-    const handleLogout = () => {
-      AsyncStorage.setItem('success', 'false'); // Set success to false
-      navigation.navigate('Login'); // Navigate to login screen
+    // const handleLogout = () => {
+    //   AsyncStorage.setItem('success', 'false'); // Set success to false
+    //   navigation.navigate('Login'); // Navigate to login screen
+    // };
+    const handleLogout = async () => {
+      try {
+        await AsyncStorage.removeItem("user"); // Remove user data
+        await AsyncStorage.removeItem("profileImage"); // Remove profile image
+        await AsyncStorage.setItem("success", "false"); // Set login state to false
+        
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Login" }], // Ensure navigation clears the stack
+        });
+    
+        console.log("User logged out successfully");
+      } catch (error) {
+        console.error("Error during logout:", error);
+      }
     };
+    
     return (
       <Modal visible={openModel} animationType="fade" transparent={true}>
+          <TouchableWithoutFeedback onPress={() => setOpenModel(false)}>
+
         <View
           style={{
             flex: 1,
@@ -148,11 +169,19 @@ const Home = ({ navigation }) => {
             alignItems: 'flex-end',
           }}>
           <View style={{ backgroundColor: 'white', padding: 15, borderRadius: 10 }}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={{ alignItems: 'flex-end' }}
               onPress={() => setOpenModel(false)}>
               <Ionicons name="close" size={24} color="black" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
+                          <View style={{ flexDirection: 'row' }}>
+                            <Ionicons name="person-outline" size={22} color="black" />
+                            <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 8 }}>
+                              Profile
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
                  <TouchableOpacity onPress={() => filterCalls('OUTGOING')}>
                           <View style={{ flexDirection: 'row' }}>
                             <Ionicons name="arrow-up-outline" size={24} color="green" />
@@ -188,6 +217,8 @@ const Home = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+        </TouchableWithoutFeedback>
+
       </Modal>
     );
   }

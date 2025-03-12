@@ -147,8 +147,10 @@ function Slider({ navigation, route }) {
                     // rippleColor={'#f8f8f8'}
                     style={{backgroundColor: 'green', padding: 10, borderRadius: 10, width: width/1.5, alignItems: 'center'}}
                     onPress={() => {
+                        setTimeout(() => {
                         // requestPermissions();
                         navigation.navigate('PermissionScreen')
+                    }, 500);
                     }}
                 />
                 <Text style={styles.privacyText}>

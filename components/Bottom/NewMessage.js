@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { 
   Alert, FlatList, StyleSheet, Text, TextInput, View, 
-  ActivityIndicator, TouchableOpacity 
+  ActivityIndicator, TouchableOpacity, PermissionsAndroid 
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import SmsAndroid from 'react-native-get-sms-android';
@@ -16,6 +16,24 @@ const NewMessage = () => {
   const [selectedSender, setSelectedSender] = useState('');
   const flatListRef = useRef(null);
 
+  // ✅ Request SMS permission
+  const requestSmsPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.SEND_SMS,
+        {
+          title: "SMS Permission",
+          message: "This app needs permission to send SMS messages.",
+          buttonPositive: "OK",
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn("SMS Permission Error:", err);
+      return false;
+    }
+  };
+
   // ✅ Fetch messages every 5 seconds (Silent Polling)
   useEffect(() => {
     if (selectedSender) {
@@ -29,7 +47,7 @@ const NewMessage = () => {
     }
   }, [selectedSender]);
 
-  // ✅ Fetch messages from SMS databases
+  // ✅ Fetch messages from SMS database
   const fetchMessages = async (sender, showLoading) => {
     if (!sender) return;
     
@@ -91,9 +109,15 @@ const NewMessage = () => {
     }
   }, [route.params]);
 
-  // ✅ Send SMS and refresh messages
+  // ✅ Send SMS with permission check
   const sendSms = async () => {
     if (!newMessage.trim()) return;
+
+    const hasPermission = await requestSmsPermission();
+    if (!hasPermission) {
+      Alert.alert("Permission Denied", "You need to grant SMS permission to send messages.");
+      return;
+    }
 
     try {
       // Optimistic UI update

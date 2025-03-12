@@ -1,8 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View, PermissionsAndroid, Modal } from 'react-native';
-// import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import React, { createContext } from 'react';
+import React, { createContext, useEffect } from 'react';
 import Contacts from 'react-native-contacts';
 
 import Splash from './normal/Splash';
@@ -22,6 +21,8 @@ import SignupScreen from '../screens/SignupScreen';
 import OtpScreen from '../screens/OtpScreen';
 import LoginScreen from '../screens/LoginScreen';
 import { commonColors } from './Common';
+import ProfileScreen from '../screens/ProfileScreen';
+
 
 const transperent = 'rgba(0,0,0,0.5)';
 const Stack = createStackNavigator();
@@ -31,7 +32,17 @@ const AppNavigator = ({ navigation }) => {
   const [openModal, setOpenModel] = React.useState(false);
   const [isRed, setIsRed] = React.useState(false);
   const [contactDetails, setContactDetails] = React.useState([]);
+  // useEffect(() => {
+  //   startCallListener();
+  // }, []);
 
+  // const startCallListener = () => {
+  //   new CallDetectorManager((event, phoneNumber) => {
+  //     if (event === "Incoming" || event === "Dialing") {
+  //       global.callInfo = phoneNumber;
+  //     }
+  //   });
+  // };
   React.useEffect(() => {
     fetchContacts();
   }, [contactDetails]);
@@ -175,6 +186,12 @@ const AppNavigator = ({ navigation }) => {
               headerStyle: { backgroundColor: commonColors.gradiend1 },
             })}
           />
+          
+          {/* <Stack.Screen
+            name="ProfileScreen"
+            component={ProfileScreen}
+            options={{ headerShown: false }}
+          /> */}
           <Stack.Screen
             name="Signup"
             component={SignupScreen}
@@ -202,6 +219,7 @@ const AppNavigator = ({ navigation }) => {
             component={AddToFavourites}
             options={{ headerShown: true }}
           />
+       
           <Stack.Screen
             name="PermissionScreen"
             component={PermissionScreen}
@@ -249,6 +267,11 @@ const AppNavigator = ({ navigation }) => {
           />
 
           <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen
+            name="ProfileScreen"
+            component={ProfileScreen}
+            options={{ headerShown: false }}
+          />
           <Stack.Screen name="Parent" component={Parent} options={{ headerShown: false }} />
           <Stack.Screen name="NewMessage" component={NewMessage} options={{ headerShown: true, title: 'Message' }} />
         </Stack.Navigator>

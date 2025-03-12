@@ -1,45 +1,118 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, FlatList,NativeModules } from 'react-native';
-import React, { useState } from 'react';
+import { 
+  View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, FlatList, 
+  NativeModules, PermissionsAndroid 
+} from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Home from '../../screens/Home';
 import SMSReader from './SMSReader';
-
+import Contacts from 'react-native-contacts';
+import CallLog from 'react-native-call-log';
+import LinearGradient from 'react-native-linear-gradient';
+import { commonColors } from '../../components/Common';
 const Bottom = createBottomTabNavigator();
-const DummyScreen = () => <View />; // ✅ FIX: Dummy Component
+const DummyScreen = () => <View />;
 const { DirectCall } = NativeModules;
 
 const BottomNavigator = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [number, setNumber] = useState('');
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [recentCalls, setRecentCalls] = useState([]);
 
+  // ✅ Request Permissions
+  const requestPermissions = async () => {
+    try {
+      const contactPermission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS
+      );
+      const callLogPermission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CALL_LOG
+      );
 
+      return (
+        contactPermission === PermissionsAndroid.RESULTS.GRANTED &&
+        callLogPermission === PermissionsAndroid.RESULTS.GRANTED
+      );
+    } catch (err) {
+      console.warn('Permission Error:', err);
+      return false;
+    }
+  };
+
+  // ✅ Fetch Contacts & Call Logs
+  const fetchContactsAndCalls = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
+
+    try {
+      // Fetch Contacts
+      const contactsList = await Contacts.getAll();
+      setContacts(
+        contactsList.map(contact => ({
+          name: contact.displayName,
+          number: contact.phoneNumbers[0]?.number || '',
+        }))
+      );
+
+      // Fetch Call Logs (last 50)
+      const callLogs = await CallLog.load(50);
+      setRecentCalls(
+        callLogs.map(log => ({
+          name: log.name || 'Unknown',
+          number: log.phoneNumber,
+        }))
+      );
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (modalVisible) {
+      fetchContactsAndCalls();
+    }
+  }, [modalVisible]);
+
+  // ✅ Filter Contacts & Calls Dynamically
+  useEffect(() => {
+    if (!number) {
+      setFilteredResults([]);
+      return;
+    }
+
+    const searchResults = [...contacts, ...recentCalls].filter(
+      item => item.number.replace(/\D/g, '').includes(number.replace(/\D/g, ''))
+    );
+
+    setFilteredResults(searchResults);
+  }, [number]);
+
+  // ✅ Handle Dialpad Input
   const handlePress = (digit) => setNumber((prev) => prev + digit);
   const handleDelete = () => setNumber(number.slice(0, -1));
 
+  // ✅ Make Call
   const handleCall = async () => {
-    try {
-      if (!number.trim()) {
-        Alert.alert('Error', 'Please enter a valid phone number.');
-        return;
-      }
-  
-      DirectCall.callNumber(String(number)); // Ensure it is a string
-    } catch (error) {
-      console.error('Error making a call:', error);
-      Alert.alert('Error', 'Unable to make a direct call.');
+    if (!number.trim()) {
+      Alert.alert('Error', 'Please enter a valid phone number.');
+      return;
     }
+    DirectCall.callNumber(String(number));
   };
-  
+
   return (
+    
     <>
+    
       <Bottom.Navigator
         screenOptions={({ route }) => ({
           tabBarStyle: styles.tabBar,
           tabBarIcon: ({ focused }) => {
             let iconName = route.name === 'Call' ? 'call' : route.name === 'Dialer' ? 'dialpad' : 'message';
-            let color = focused ? '#007AFF' : 'black';
+            let color = focused ? '#ebf5ff' : 'black';
             return <Icon name={iconName} size={28} color={color} />;
           },
           tabBarLabel: ({ focused }) => (
@@ -49,11 +122,9 @@ const BottomNavigator = () => {
         })}
       >
         <Bottom.Screen name="Call" component={Home} />
-
-        {/* ✅ FIX: Dummy Screen, Opens Modal */}
         <Bottom.Screen
           name="Dialer"
-          component={DummyScreen} // Dummy component
+          component={DummyScreen}
           listeners={{
             tabPress: (e) => {
               e.preventDefault();
@@ -61,18 +132,41 @@ const BottomNavigator = () => {
             },
           }}
         />
-
         <Bottom.Screen name="Message" component={SMSReader} />
       </Bottom.Navigator>
 
       {/* 🔥 MODAL DialerPad */}
-      <Modal visible={modalVisible} animationType="slide" transparent={true} >
+      {/* <LinearGradient colors={[commonColors.gradiend1, commonColors.light]} style={styles.container}> */}
+
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        
         <View style={styles.modalContainer}>
-   
+      
 
-          {/* 📟 Dialpad Display */}
-          <Text style={styles.display}>{number || 'Enter Number'}</Text>
-
+          {/* 🔎 Dynamic Search Results */}
+          {filteredResults.length > 0 && (
+            <FlatList
+              data={filteredResults}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.contactItem}
+                  onPress={() => setNumber(item.number)}
+                >
+                  <Text style={styles.contactName}>{item.name}</Text>
+                  <Text style={styles.contactNumber}>{item.number}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+    <TextInput
+            style={styles.display}
+            value={number}
+            placeholder="Enter Number"
+            placeholderTextColor="gray"
+            keyboardType="numeric"
+            onChangeText={setNumber}
+          />
           {/* 🔢 Dialpad */}
           <View style={styles.dialpad}>
             {['1', '2 ABC', '3 DEF', '4 GHI', '5 JKL', '6 MNO', '7 PQRS', '8 TUV', '9 WXYZ', '*', '0 +', '#'].map(
@@ -87,140 +181,39 @@ const BottomNavigator = () => {
 
           {/* 📲 Call & Delete Buttons */}
           <View style={styles.actions}>
-          <TouchableOpacity style={styles.callButton} onPress={handleCall}>
-          <Icon name="call" size={30} color="#fff" />
+            <TouchableOpacity style={styles.callButton} onPress={handleCall}>
+              <Icon name="call" size={30} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
               <Icon name="backspace" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity style={styles.closeButton} onPress={() =>{setNumber(''); setModalVisible(false)}}>
               <Icon name="close" size={30} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
+      {/* </LinearGradient> */}
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  tabBar: {
-    // backgroundColor: '#fff',
-    backgroundColor: 'rgba(0, 229, 255, 2)', // Neon blue transparency
-
-    height: 55,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    position: 'absolute',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 10,
-  },
-  tabLabel: {
-    fontSize: 12,
-    color: 'black',
-    fontWeight: '600',
-  },
-  activeLabel: {
-    color: '#007AFF',
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#181818',
-    paddingTop: 40,
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 229, 255, 2)', // Neon blue transparency
-
-  },
-  searchBar: {
-    width: '90%',
-    backgroundColor: '#222',
-    color: 'white',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  contactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '90%',
-    padding: 10,
-    backgroundColor: '#222',
-    borderRadius: 10,
-    marginVertical: 5,
-  },
-  contactName: {
-    fontSize: 16,
-    color: 'white',
-  },
-  contactNumber: {
-    fontSize: 14,
-    color: '#999',
-  },
-  display: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginVertical: 20,
-    color: 'white',
-  },
-  dialpad: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '75%',
-    justifyContent: 'center',
-    marginVertical: 10,
-    
-  },
-  key: {
-    width: 80,
-    height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(12, 57, 62, 0.2)', // Neon blue with transparency
-    margin: 5,
-    borderRadius: 40,
-    borderWidth: 3, // ✅ Thicker border for visibility
-    borderColor: '#00E5FF', // Bright cyan border
-    shadowColor: '#00E5FF', // ✅ Stronger glow effect
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8, // ✅ More visible shadow
-    shadowRadius: 10, // ✅ Larger glow radius
-    elevation: 10, // ✅ For Android shadow effect
-  },
-
-  keyText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  keySubText: {
-    fontSize: 10,
-    color: 'white',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '80%',
-    marginVertical: 10,
-  },
-  callButton: {
-    backgroundColor: '#00A000',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 30,
-  },
-  deleteButton: {
-    backgroundColor: 'red',
-    padding: 20,
-    borderRadius: 50,
-  },
-  closeButton: {
-    backgroundColor: 'gray',
-    padding: 20,
-    borderRadius: 50,
-  },
+  tabBar: { backgroundColor: '#007AFF', height: 55 },
+  tabLabel: { fontSize: 12, fontWeight: '600' },
+  activeLabel: { color: '#fff' },
+  modalContainer: { flex: 1, backgroundColor: '#181818', padding: 20, alignItems: 'center' },
+  display: { fontSize: 28, fontWeight: 'bold', color: 'white', textAlign: 'center', marginBottom: 10 },
+  contactItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#444' },
+  contactName: { fontSize: 18, color: 'white' },
+  contactNumber: { fontSize: 14, color: '#999' },
+  dialpad: { flexDirection: 'row', flexWrap: 'wrap', width: '75%', justifyContent: 'center' },
+  key: { width: 80, height: 80, justifyContent: 'center', alignItems: 'center' },
+  keyText: { fontSize: 24, fontWeight: 'bold', color: 'white' },
+  actions: { flexDirection: 'row', justifyContent: 'space-between', width: '80%' },
+  callButton: { backgroundColor: 'green', padding: 20, borderRadius: 50 },
+  deleteButton: { backgroundColor: 'red', padding: 20, borderRadius: 50 },
+  closeButton: { backgroundColor: 'gray', padding: 20, borderRadius: 50 },
 });
 
 export default BottomNavigator;

@@ -41,7 +41,7 @@ const ContactsInfo = ({ navigation }) => {
       </View>
 
       {/* Spam Warning */}
-      <View style={styles.spamWarning}>
+      {/* <View style={styles.spamWarning}>
         <Text style={styles.spamTitle}>Spam protection disabled</Text>
         <Text style={styles.spamDescription}>
           Allow Truecaller to identify numbers and block calls.
@@ -49,7 +49,7 @@ const ContactsInfo = ({ navigation }) => {
         <TouchableOpacity>
           <Text style={styles.spamEnable}>ENABLE</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {/* Contact List */}
       <FlatList

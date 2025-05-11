@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import SignupScreen from './SignupScreen';
+import { openSettings } from 'react-native-permissions';
 
+import SignupScreen from './SignupScreen';
 
 const PermissionScreen = ({ navigation }) => {
   const [permissionsGranted, setPermissionsGranted] = useState(false);
@@ -13,12 +14,36 @@ const PermissionScreen = ({ navigation }) => {
       try {
         const callLogPermission = await request(PERMISSIONS.ANDROID.READ_CALL_LOG);
         const contactsPermission = await request(PERMISSIONS.ANDROID.READ_CONTACTS);
-
-        if (callLogPermission === RESULTS.GRANTED && contactsPermission === RESULTS.GRANTED) {
+        const phoneStatePermission = await request(PERMISSIONS.ANDROID.READ_PHONE_STATE);
+        const callPhonePermission = await request(PERMISSIONS.ANDROID.CALL_PHONE);
+        console.log('Permissions Status:', {
+          callLogPermission,
+          contactsPermission,
+          phoneStatePermission,
+          callPhonePermission,
+        });
+        if (
+          callLogPermission === RESULTS.GRANTED &&
+          contactsPermission === RESULTS.GRANTED &&
+          // phoneStatePermission === RESULTS.GRANTED &&
+          callPhonePermission === RESULTS.GRANTED
+        ) {
           setPermissionsGranted(true);
         } else {
-          Alert.alert('Permissions Required', 'Please grant the required permissions to continue.');
+          if (phoneStatePermission === RESULTS.BLOCKED) {
+            Alert.alert(
+              'Permission Blocked',
+              'Phone state permission is blocked. Please enable it from settings.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Open Settings', onPress: () => openSettings() },
+              ]
+            );
+          } else {
+            Alert.alert('Permissions Required', 'Please grant the required permissions to continue.');
+          }
         }
+        
       } catch (error) {
         console.error('Error requesting permissions:', error);
       }
